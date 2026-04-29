@@ -3,159 +3,616 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Competição de Adesivagem</title>
+<title>Competicao de Adesivagem</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:#070c14;color:#e8eaf0;font-family:'Barlow',sans-serif;min-height:100vh;}
-:root{--bg:#070c14;--surface:#0d1520;--card:#111c2e;--border:#1a2d45;--accent:#3b9eff;--accent2:#1a5fb4;--muted:#7a8099;--text:#e8eaf0;--gold:#60b4ff;--silver:#90caf9;--bronze:#4a90d9;}
-.wrap{max-width:1380px;margin:0 auto;}
-.hdr{background:linear-gradient(135deg,#070c14 0%,#0a1628 50%,#070c14 100%);border-bottom:2px solid var(--accent);padding:20px 24px 14px;overflow:hidden;position:relative;}
-.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(59,158,255,.15) 0%,transparent 70%);border-radius:50%;}
-.hdr-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-.hdr-left{display:flex;align-items:center;gap:12px;}
-.trophy{font-size:2.4rem;filter:drop-shadow(0 0 10px rgba(59,158,255,.6));animation:glow 2s ease-in-out infinite;}
-@keyframes glow{0%,100%{filter:drop-shadow(0 0 10px rgba(59,158,255,.6));}50%{filter:drop-shadow(0 0 20px rgba(59,158,255,.9));}}
-h1{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;color:var(--accent);line-height:1;}
-h1 span{display:block;font-size:.75rem;font-family:'Barlow Condensed',sans-serif;font-weight:600;color:var(--muted);letter-spacing:5px;text-transform:uppercase;margin-top:3px;}
-.mbadge{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:3px 11px;border-radius:20px;}
-.mbadge.ed{background:rgba(59,158,255,.15);border:1px solid var(--accent);color:var(--accent);}
-.mbadge.vw{background:rgba(96,180,255,.1);border:1px solid var(--gold);color:var(--gold);}
-.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.badges{display:flex;gap:8px;flex-wrap:wrap;}
-.badge{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:7px 14px;text-align:center;}
-.badge .n{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:var(--accent);line-height:1;}
-.badge .l{font-size:.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
-.wkbar{padding:10px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
-.wklbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.wkinput{background:var(--card);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.92rem;padding:5px 12px;border-radius:8px;outline:none;width:200px;}
-.wkval{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;color:var(--text);background:var(--card);border:1px solid var(--border);padding:5px 14px;border-radius:8px;}
-.tabs-wrap{padding:0 24px;overflow-x:auto;scrollbar-width:thin;}
-.tabs{display:flex;gap:4px;min-width:max-content;border-bottom:2px solid var(--border);}
-.tab{background:none;border:1.5px solid transparent;border-bottom:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:7px 13px;border-radius:8px 8px 0 0;position:relative;top:2px;transition:all .2s;white-space:nowrap;}
-.tab.active{color:var(--accent);background:var(--surface);border-color:var(--border);border-bottom-color:var(--surface);}
-.tbadge{display:inline-block;background:var(--accent2);color:#fff;font-size:.64rem;padding:1px 5px;border-radius:20px;margin-left:4px;font-weight:700;}
-.tab.active .tbadge{background:var(--accent);color:var(--bg);}
-.panels{padding:0 24px 60px;}
-.ph{display:flex;align-items:center;justify-content:space-between;padding:20px 0 14px;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap;gap:10px;}
-.pname{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:3px;color:var(--text);}
-.pname span{color:var(--accent);}
-.stats{display:flex;gap:9px;flex-wrap:wrap;}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:7px 14px;text-align:center;min-width:80px;}
-.stat .v{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;line-height:1;}
-.stat.p .v{color:var(--accent);}
-.stat.s .v{color:var(--muted);}
-.stat .l{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:1px;}
-.prg{margin-bottom:22px;}
-.prg-lbl{display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.prg-track{background:var(--card);border-radius:100px;height:9px;border:1px solid var(--border);overflow:hidden;}
-.prg-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .8s cubic-bezier(.4,0,.2,1);}
-.addwk{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px;margin-bottom:22px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
-.addwk .lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.wni{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.9rem;padding:6px 10px;border-radius:7px;width:136px;outline:none;}
-.cni{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.15rem;padding:6px 10px;border-radius:7px;width:80px;outline:none;text-align:center;}
-.btn-add{background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:2px;padding:8px 16px;border-radius:7px;}
-.sec-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
-.wkgrid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
-.wkcard{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:7px 12px;display:flex;align-items:center;gap:8px;}
-.wkcard .wl{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.wkcard .wc{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--accent);line-height:1;}
-.wk-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:2px 4px;}
-.empty{color:var(--muted);font-size:.78rem;font-family:'Barlow Condensed',sans-serif;letter-spacing:1.5px;text-transform:uppercase;}
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:13px;}
-.pitem{position:relative;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;}
-.pitem img{width:100%;height:100%;object-fit:cover;display:block;}
-.pdel{position:absolute;top:5px;right:5px;background:rgba(7,12,20,.85);color:#e8392a;border:none;border-radius:5px;width:28px;height:28px;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;}
-.ptag{position:absolute;bottom:4px;left:4px;background:rgba(59,158,255,.9);color:var(--bg);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.63rem;letter-spacing:1.5px;text-transform:uppercase;padding:2px 6px;border-radius:4px;}
-.upzone{border:2px dashed var(--border);border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:var(--card);user-select:none;}
-.upzone .ui{font-size:1.6rem;margin-bottom:4px;}
-.upzone p{font-family:'Barlow Condensed',sans-serif;font-size:.76rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.plates-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:22px;}
-.plate-tag{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:5px 10px;}
-.plate-tag span{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--text);}
-.rtoggle{display:flex;gap:7px;margin-bottom:14px;}
-.rtbtn{background:var(--card);border:1.5px solid var(--border);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;padding:6px 15px;border-radius:7px;cursor:pointer;}
-.rtbtn.active{background:var(--accent);color:var(--bg);border-color:var(--accent);}
-.rbox{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;}
-.rbhdr{background:linear-gradient(90deg,rgba(59,158,255,.12),rgba(26,95,180,.08));padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.rbhdr h2{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:3px;color:var(--accent);}
-.wkbadge{background:var(--accent);color:var(--bg);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:2px;padding:3px 10px;border-radius:20px;}
-.rrow{display:flex;align-items:center;gap:11px;padding:10px 18px;border-bottom:1px solid var(--border);cursor:pointer;}
-.rrow:last-child{border-bottom:none;}
-.rpos{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;width:30px;text-align:center;flex-shrink:0;}
-.rpos.p1{color:var(--gold)}.rpos.p2{color:var(--silver)}.rpos.p3{color:var(--bronze)}.rpos.po{color:var(--muted);}
-.rname{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.92rem;flex:1;}
-.rbarw{flex:2;display:flex;align-items:center;gap:6px;}
-.rbar{flex:1;height:6px;background:var(--surface);border-radius:100px;overflow:hidden;}
-.rbarf{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent2),var(--accent));}
-.rcars{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;color:var(--accent);min-width:40px;text-align:right;}
-.rpct{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--muted);min-width:36px;text-align:right;}
-.sbtns{display:flex;gap:7px;flex-wrap:wrap;}
-.sbtn{border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:2px;padding:8px 16px;border-radius:8px;color:var(--bg);}
-.sbtn.s1{background:linear-gradient(135deg,#1a5fb4,#3b9eff);}
-.sbtn.s2{background:linear-gradient(135deg,#0d3a6e,#1a5fb4);}
-.prog-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px 18px;margin-top:4px;}
-.prog-card .note{margin-top:8px;font-size:.7rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:1.5px;}
-.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;align-items:center;justify-content:center;}
-.lb.open{display:flex;}
-.lb img{max-width:90vw;max-height:90vh;border-radius:10px;}
-.lbclose{position:absolute;top:16px;right:22px;background:none;border:none;color:#fff;font-size:1.9rem;cursor:pointer;}
-.pwscreen{display:flex;align-items:center;justify-content:center;min-height:80vh;}
-.pwbox{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:36px 32px;text-align:center;max-width:340px;width:100%;}
-.pwbox h2{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:3px;color:var(--accent);margin-bottom:4px;}
-.pwbox p{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:20px;}
-.pwinp{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:1rem;padding:9px 12px;border-radius:7px;width:100%;outline:none;text-align:center;letter-spacing:3px;margin-bottom:10px;}
-.pwbtn{background:linear-gradient(135deg,#1a5fb4,#3b9eff);color:var(--bg);border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 0;border-radius:7px;width:100%;}
-.pwerr{color:#e8392a;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
-.toast{position:fixed;bottom:16px;right:16px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;border-radius:20px;opacity:0;transition:opacity .4s;pointer-events:none;z-index:999;}
-.toast.ok{background:rgba(59,158,255,.2);border:1px solid var(--accent);color:var(--accent);}
-.toast.err{background:rgba(232,57,42,.2);border:1px solid #e8392a;color:#e8392a;}
-.toast.show{opacity:1;}
-.back-btn{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:5px 11px;border-radius:7px;}
-.refbtn{background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:5px 11px;border-radius:7px;cursor:pointer;}
-.sel-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:20px;background:var(--bg);}
-.sel-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:10px;}
-.sel-btn{border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;padding:14px 30px;border-radius:10px;}
-.sel-btn.vw{background:linear-gradient(135deg,#0d3a6e,#1a5fb4);color:#e8eaf0;}
-.sel-btn.ed{background:linear-gradient(135deg,#1a5fb4,#3b9eff);color:#070c14;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;}
-.modal-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;width:100%;max-width:360px;}
-.modal-box h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--accent);margin-bottom:6px;}
-.modal-box p{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:16px;}
-.plate-inp{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:4px;padding:10px 14px;border-radius:8px;width:100%;outline:none;text-align:center;text-transform:uppercase;margin-bottom:10px;}
-.plate-err{color:#e8392a;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;text-align:center;}
-.modal-btns{display:flex;gap:10px;}
-.modal-btns button{flex:1;border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;padding:10px;border-radius:8px;}
-.mbtn-cancel{background:var(--surface);color:var(--muted);}
-.mbtn-confirm{background:linear-gradient(135deg,#1a5fb4,#3b9eff);color:var(--bg);}
-@media(max-width:720px){.hdr,.wkbar,.tabs-wrap,.panels{padding-left:14px;padding-right:14px;}h1{font-size:1.6rem;}.pgrid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#070c14;color:#e8eaf0;font-family:'Barlow',sans-serif;min-height:100vh}
+:root{--bg:#070c14;--surface:#0d1520;--card:#111c2e;--border:#1a2d45;--accent:#3b9eff;--accent2:#1a5fb4;--muted:#7a8099;--text:#e8eaf0;--gold:#60b4ff;--silver:#90caf9;--bronze:#4a90d9}
+.wrap{max-width:1380px;margin:0 auto}
+.hdr{background:linear-gradient(135deg,#070c14,#0a1628 50%,#070c14);border-bottom:2px solid var(--accent);padding:20px 24px 14px;position:relative;overflow:hidden}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.hdr-left{display:flex;align-items:center;gap:12px}
+h1{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;color:var(--accent);line-height:1}
+h1 span{display:block;font-size:.75rem;font-family:'Barlow Condensed',sans-serif;font-weight:600;color:var(--muted);letter-spacing:5px;text-transform:uppercase;margin-top:3px}
+.mbadge{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:3px 11px;border-radius:20px}
+.mbadge.ed{background:rgba(59,158,255,.15);border:1px solid var(--accent);color:var(--accent)}
+.mbadge.vw{background:rgba(96,180,255,.1);border:1px solid var(--gold);color:var(--gold)}
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:7px 14px;text-align:center}
+.badge .n{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:var(--accent);line-height:1}
+.badge .l{font-size:.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.wkbar{padding:10px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.wklbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.wkinput{background:var(--card);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.92rem;padding:5px 12px;border-radius:8px;outline:none;width:200px}
+.wkval{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;color:var(--text);background:var(--card);border:1px solid var(--border);padding:5px 14px;border-radius:8px}
+.tabs-wrap{padding:0 24px;overflow-x:auto}
+.tabs{display:flex;gap:4px;min-width:max-content;border-bottom:2px solid var(--border)}
+.tab{background:none;border:1.5px solid transparent;border-bottom:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:7px 13px;border-radius:8px 8px 0 0;position:relative;top:2px;white-space:nowrap}
+.tab.active{color:var(--accent);background:var(--surface);border-color:var(--border);border-bottom-color:var(--surface)}
+.tbadge{display:inline-block;background:var(--accent2);color:#fff;font-size:.64rem;padding:1px 5px;border-radius:20px;margin-left:4px;font-weight:700}
+.tab.active .tbadge{background:var(--accent);color:var(--bg)}
+.panels{padding:0 24px 60px}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:20px 0 14px;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.pname{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:3px;color:var(--text)}
+.pname span{color:var(--accent)}
+.stats{display:flex;gap:9px;flex-wrap:wrap}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:7px 14px;text-align:center;min-width:80px}
+.stat .v{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;line-height:1}
+.stat.p .v{color:var(--accent)}
+.stat.s .v{color:var(--muted)}
+.stat .l{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:1px}
+.prg{margin-bottom:22px}
+.prg-lbl{display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.prg-track{background:var(--card);border-radius:100px;height:9px;border:1px solid var(--border);overflow:hidden}
+.prg-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.addwk{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px;margin-bottom:22px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.addwk .lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.wni{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.9rem;padding:6px 10px;border-radius:7px;width:136px;outline:none}
+.cni{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.15rem;padding:6px 10px;border-radius:7px;width:80px;outline:none;text-align:center}
+.btn-add{background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:2px;padding:8px 16px;border-radius:7px}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.wkgrid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.wkcard{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:7px 12px;display:flex;align-items:center;gap:8px}
+.wkcard .wl{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.wkcard .wc{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--accent);line-height:1}
+.wk-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:2px 4px}
+.empty{color:var(--muted);font-size:.78rem;font-family:'Barlow Condensed',sans-serif;letter-spacing:1.5px;text-transform:uppercase}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:13px}
+.pitem{position:relative;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;aspect-ratio:4/3;cursor:pointer}
+.pitem img{width:100%;height:100%;object-fit:cover;display:block}
+.pdel{position:absolute;top:5px;right:5px;background:rgba(7,12,20,.85);color:#e8392a;border:none;border-radius:5px;width:28px;height:28px;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+.ptag{position:absolute;bottom:4px;left:4px;background:rgba(59,158,255,.9);color:var(--bg);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.63rem;letter-spacing:1.5px;text-transform:uppercase;padding:2px 6px;border-radius:4px}
+.upzone{border:2px dashed var(--border);border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:var(--card)}
+.upzone .ui{font-size:1.6rem;margin-bottom:4px}
+.upzone p{font-family:'Barlow Condensed',sans-serif;font-size:.76rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.plates-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:22px}
+.plate-tag{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:5px 10px}
+.plate-tag span{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--text)}
+.rtoggle{display:flex;gap:7px;margin-bottom:14px}
+.rtbtn{background:var(--card);border:1.5px solid var(--border);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;padding:6px 15px;border-radius:7px;cursor:pointer}
+.rtbtn.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.rbox{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.rbhdr{background:linear-gradient(90deg,rgba(59,158,255,.12),rgba(26,95,180,.08));padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.rbhdr h2{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:3px;color:var(--accent)}
+.wkbadge{background:var(--accent);color:var(--bg);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:2px;padding:3px 10px;border-radius:20px}
+.rrow{display:flex;align-items:center;gap:11px;padding:10px 18px;border-bottom:1px solid var(--border);cursor:pointer}
+.rrow:last-child{border-bottom:none}
+.rpos{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;width:30px;text-align:center;flex-shrink:0}
+.rpos.p1{color:var(--gold)}.rpos.p2{color:var(--silver)}.rpos.p3{color:var(--bronze)}.rpos.po{color:var(--muted)}
+.rname{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.92rem;flex:1}
+.rbarw{flex:2;display:flex;align-items:center;gap:6px}
+.rbar{flex:1;height:6px;background:var(--surface);border-radius:100px;overflow:hidden}
+.rbarf{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.rcars{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;color:var(--accent);min-width:40px;text-align:right}
+.rpct{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--muted);min-width:36px;text-align:right}
+.sbtns{display:flex;gap:7px;flex-wrap:wrap}
+.sbtn{border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:2px;padding:8px 16px;border-radius:8px;color:var(--bg)}
+.sbtn.s1{background:linear-gradient(135deg,#1a5fb4,#3b9eff)}
+.sbtn.s2{background:linear-gradient(135deg,#0d3a6e,#1a5fb4)}
+.prog-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px 18px;margin-top:4px}
+.prog-card .note{margin-top:8px;font-size:.7rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:1.5px}
+.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;align-items:center;justify-content:center}
+.lb.open{display:flex}
+.lb img{max-width:90vw;max-height:90vh;border-radius:10px}
+.lbclose{position:absolute;top:16px;right:22px;background:none;border:none;color:#fff;font-size:1.9rem;cursor:pointer}
+.pwscreen{display:flex;align-items:center;justify-content:center;min-height:80vh}
+.pwbox{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:36px 32px;text-align:center;max-width:340px;width:100%}
+.pwbox h2{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:3px;color:var(--accent);margin-bottom:4px}
+.pwbox p{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:20px}
+.pwinp{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:1rem;padding:9px 12px;border-radius:7px;width:100%;outline:none;text-align:center;letter-spacing:3px;margin-bottom:10px}
+.pwbtn{background:linear-gradient(135deg,#1a5fb4,#3b9eff);color:var(--bg);border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;padding:9px 0;border-radius:7px;width:100%}
+.pwerr{color:#e8392a;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.toast{position:fixed;bottom:16px;right:16px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;border-radius:20px;opacity:0;transition:opacity .4s;pointer-events:none;z-index:999}
+.toast.ok{background:rgba(59,158,255,.2);border:1px solid var(--accent);color:var(--accent)}
+.toast.err{background:rgba(232,57,42,.2);border:1px solid #e8392a;color:#e8392a}
+.toast.show{opacity:1}
+.back-btn{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:5px 11px;border-radius:7px}
+.refbtn{background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:5px 11px;border-radius:7px;cursor:pointer}
+.sel-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:20px;background:var(--bg)}
+.sel-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.sel-btn{border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;padding:14px 30px;border-radius:10px}
+.sel-btn.vw{background:linear-gradient(135deg,#0d3a6e,#1a5fb4);color:#e8eaf0}
+.sel-btn.ed{background:linear-gradient(135deg,#1a5fb4,#3b9eff);color:#070c14}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;width:100%;max-width:360px}
+.modal-box h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--accent);margin-bottom:6px}
+.modal-box p{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:16px}
+.plate-inp{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:4px;padding:10px 14px;border-radius:8px;width:100%;outline:none;text-align:center;text-transform:uppercase;margin-bottom:10px}
+.plate-err{color:#e8392a;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;text-align:center}
+.modal-btns{display:flex;gap:10px}
+.modal-btns button{flex:1;border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;padding:10px;border-radius:8px}
+.mbtn-cancel{background:var(--surface);color:var(--muted)}
+.mbtn-confirm{background:linear-gradient(135deg,#1a5fb4,#3b9eff);color:var(--bg)}
+@media(max-width:720px){.hdr,.wkbar,.tabs-wrap,.panels{padding-left:14px;padding-right:14px}h1{font-size:1.6rem}.pgrid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}}
 </style>
 </head>
 <body>
 <div id="app"></div>
-  
-  function goSelect(){state.mode="select";render();}
-function goViewer(){state.mode="viewer";loadFromFirebase();}
-function goEditorLogin(){state.mode="editor-login";state.pw="";state.pwErr=false;render();}
-function doLogin(){const inp=document.getElementById('pw-inp');const pw=inp?inp.value:"";if(pw===EDITOR_PASSWORD){state.mode="editor";state.pwErr=false;loadFromFirebase();}else{state.pwErr=true;render();}}
-function reloadData(){loadFromFirebase();}
-function setTab(tab){state.activeTab=tab;render();}
-function setRankView(v){state.rankView=v;render();}
-function updateWeek(val){state.currentWeek=val;scheduleSave();render();}
-function updatePlateInput(val){state.plateInput=val.toUpperCase();state.plateErr="";render();}
-function openLightbox(src){state.lightbox=src;render();}
-function closeLightbox(){state.lightbox=null;render();}
-function addWeek(teamId){const nameEl=document.getElementById(`wk-name-${teamId}`);const carsEl=document.getElementById(`wk-cars-${teamId}`);const name=nameEl?nameEl.value.trim():"";const cars=carsEl?parseInt(carsEl.value):0;if(!cars||cars<=0)return;const wname=name||`Semana ${state.teams[teamId].weeks.length+1}`;state.teams[teamId].weeks.push({name:wname,cars});state.weekInputs[teamId]={name:"",cars:""};scheduleSave();render();}
-function deleteWeek(teamId,idx){state.teams[teamId].weeks.splice(idx,1);scheduleSave();render();}
-function handleUpload(event,teamId){const files=Array.from(event.target.files);if(!files.length)return;const weekName=state.weekInputs[teamId]?.name?.trim()||state.currentWeek||"";const reader=new FileReader();reader.onload=ev=>{state.plateModal={teamId,src:ev.target.result,week:weekName,allFiles:files,currentIndex:0,totalFiles:files.length};state.plateInput="";state.plateErr="";render();};reader.readAsDataURL(files[0]);event.target.value="";}
-function confirmPlate(){if(!state.plateModal)return;const inp=document.getElementById('plate-inp');const plate=(inp?inp.value:state.plateInput).trim().toUpperCase();if(!plate){state.plateErr="Digite a placa!";render();return;}const dup=getAllPlates().find(p=>p.plate===plate);if(dup){state.plateErr=`Já cadastrada: ${dup.teamName}`;render();return;}const{teamId,src,week,allFiles,currentIndex,totalFiles}=state.plateModal;state.teams[teamId].photos.push({src,week,plate});state.teams[teamId].plates.push({plate,week});showToast(`✓ ${plate} registrada!`);nextPhoto(teamId,week,allFiles,currentIndex,totalFiles);}
-function skipPlate(){if(!state.plateModal)return;const{teamId,src,week,allFiles,currentIndex,totalFiles}=state.plateModal;state.teams[teamId].photos.push({src,week,plate:""});nextPhoto(teamId,week,allFiles,currentIndex,totalFiles);}
-function nextPhoto(teamId,week,allFiles,currentIndex,totalFiles){scheduleSave();const nextIndex=currentIndex+1;if(nextIndex<totalFiles){const reader=new FileReader();reader.onload=ev=>{state.plateModal={teamId,src:ev.target.result,week,allFiles,currentIndex:nextIndex,totalFiles};state.plateInput="";state.plateErr="";render();};reader.readAsDataURL(allFiles[nextIndex]);}else{state.plateModal=null;render();}}
-function deletePhoto(teamId,idx){const photo=state.teams[teamId].photos[idx];state.teams[teamId].photos.splice(idx,1);if(photo?.plate){state.teams[teamId].plates=state.teams[teamId].plates.filter(p=>p.plate!==photo.plate);}scheduleSave();render();}
+  <script>
+var FB_CONFIG = {
+  apiKey: "AIzaSyBuZst0oOe6O0nHbMpqoi3jHn2g30TwkOk",
+  authDomain: "competicao-roriz.firebaseapp.com",
+  databaseURL: "https://competicao-roriz-default-rtdb.firebaseio.com",
+  projectId: "competicao-roriz",
+  storageBucket: "competicao-roriz.firebasestorage.app",
+  messagingSenderId: "54357624066",
+  appId: "1:54357624066:web:66a8b5fa08b8505abaae1b"
+};
+firebase.initializeApp(FB_CONFIG);
+var db = firebase.database();
+
+var TEAMS = [
+  {id:0, name:"Alberto e Gilson"},
+  {id:1, name:"Gemildo"},
+  {id:2, name:"Jesion"},
+  {id:3, name:"Nogueira e Feitosa"},
+  {id:4, name:"Miranda"},
+  {id:5, name:"Wberthyer"},
+  {id:6, name:"Paulo"},
+  {id:7, name:"Ze Roberto"},
+  {id:8, name:"Henrique"}
+];
+var META = 70;
+var META_TOTAL = META * TEAMS.length;
+var SENHA = "roriz2025";
+
+var S = {
+  mode: "select",
+  tab: "ranking",
+  rankView: "total",
+  semana: "",
+  teams: {},
+  pwErr: false,
+  lightbox: null,
+  toastShow: false,
+  toastMsg: "",
+  toastType: "ok",
+  modal: null,
+  plateInput: "",
+  plateErr: "",
+  wi: {},
+  loaded: false
+};
+
+TEAMS.forEach(function(t) {
+  S.teams[t.id] = {weeks:[], photos:[], plates:[]};
+  S.wi[t.id] = {name:"", cars:""};
+});
+
+var saveTimer = null;
+function salvar() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function() {
+    var data = {semana: S.semana, teams: {}};
+    TEAMS.forEach(function(t) {
+      data.teams[t.id] = {
+        weeks: S.teams[t.id].weeks || [],
+        plates: S.teams[t.id].plates || [],
+        photos: (S.teams[t.id].photos || []).map(function(p) {
+          return {src: p.src||"", week: p.week||"", plate: p.plate||""};
+        })
+      };
+    });
+    db.ref("comp").set(data)
+      .then(function() { toast("Salvo!", "ok"); })
+      .catch(function() { toast("Erro ao salvar", "err"); });
+  }, 800);
+}
+
+function carregar() {
+  db.ref("comp").once("value").then(function(snap) {
+    var d = snap.val();
+    if (d) {
+      S.semana = d.semana || "";
+      TEAMS.forEach(function(t) {
+        if (d.teams && d.teams[t.id]) {
+          var td = d.teams[t.id];
+          S.teams[t.id] = {
+            weeks: td.weeks || [],
+            plates: td.plates || [],
+            photos: td.photos || []
+          };
+        }
+      });
+    }
+    S.loaded = true;
+    render();
+  }).catch(function() { S.loaded = true; render(); });
+}
+
+function somarCarros(t) {
+  return (t && t.weeks ? t.weeks : []).reduce(function(s,w) { return s + (w.cars||0); }, 0);
+}
+function totalGeral() {
+  return TEAMS.reduce(function(s,t) { return s + somarCarros(S.teams[t.id]); }, 0);
+}
+function todasPlacas() {
+  var all = [];
+  TEAMS.forEach(function(t) {
+    (S.teams[t.id].plates || []).forEach(function(p) {
+      all.push({plate: p.plate, time: t.name});
+    });
+  });
+  return all;
+}
+function carrosSemana(tid) {
+  var wks = S.teams[tid].weeks || [];
+  var match = wks.filter(function(w) { return w.name.trim() === S.semana.trim(); });
+  if (match.length) return match.reduce(function(s,w) { return s+w.cars; }, 0);
+  if (wks.length) return wks[wks.length-1].cars;
+  return 0;
+}
+function ranking(modo) {
+  return TEAMS.map(function(t) {
+    return {id:t.id, name:t.name, total: modo==="week" ? carrosSemana(t.id) : somarCarros(S.teams[t.id])};
+  }).sort(function(a,b) { return b.total - a.total; });
+}
+
+var toastTimer = null;
+function toast(msg, type) {
+  S.toastShow = true; S.toastMsg = msg; S.toastType = type||"ok";
+  render();
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { S.toastShow = false; render(); }, 2500);
+}
+
+function render() {
+  var app = document.getElementById("app");
+  if (app) app.innerHTML = html();
+}
+
+function html() {
+  if (S.mode === "select") return telaSelect();
+  if (S.mode === "login") return telaLogin();
+  if (!S.loaded) return '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;font-size:2rem;color:#3b9eff">Carregando...</div>';
+  return telaMain();
+}
+
+function telaSelect() {
+  return '<div class="sel-screen">' +
+    '<div style="font-size:3rem">&#127942;</div>' +
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:2rem;letter-spacing:3px;color:#3b9eff;text-align:center">' +
+    'Competicao de Adesivagem' +
+    '<div style="font-size:.75rem;color:#7a8099;letter-spacing:5px;margin-top:6px">JOAQUIM RORIZ NETO</div>' +
+    '</div>' +
+    '<div class="sel-btns">' +
+    '<button class="sel-btn vw" onclick="irViewer()">Ver Resultados</button>' +
+    '<button class="sel-btn ed" onclick="irLogin()">Editar (Admin)</button>' +
+    '</div></div>';
+}
+
+function telaLogin() {
+  return '<div style="min-height:100vh;background:#070c14"><div class="pwscreen"><div class="pwbox">' +
+    '<div style="font-size:2rem;margin-bottom:10px">&#128274;</div>' +
+    '<h2>Acesso Editor</h2><p>Digite a senha</p>' +
+    '<input class="pwinp" type="password" id="pw" placeholder="senha" onkeydown="if(event.key===\'Enter\')login()">' +
+    (S.pwErr ? '<div class="pwerr">Senha incorreta</div>' : '') +
+    '<button class="pwbtn" onclick="login()">Entrar</button>' +
+    '<div style="margin-top:14px"><button class="back-btn" onclick="irSelect()">Voltar</button></div>' +
+    '</div></div></div>';
+}
+</script>
+
+  <script>
+function telaMain() {
+  var isEd = S.mode === "editor";
+  var grand = totalGeral();
+  var pct = Math.min(100, Math.round(grand/META_TOTAL*100));
+  var painel = "";
+  if (S.tab === "ranking") {
+    painel = painelRanking(grand, pct);
+  } else {
+    for (var i=0; i<TEAMS.length; i++) {
+      if (TEAMS[i].id === S.tab) {
+        painel = isEd ? painelEditor(TEAMS[i]) : painelViewer(TEAMS[i]);
+        break;
+      }
+    }
+  }
+  var tabs = '<button class="tab '+(S.tab==="ranking"?"active":"")+'" onclick="aba(\'ranking\')">Ranking</button>';
+  for (var j=0; j<TEAMS.length; j++) {
+    var t = TEAMS[j];
+    tabs += '<button class="tab '+(S.tab===t.id?"active":"")+'" onclick="aba('+t.id+')">'+t.name+'<span class="tbadge">'+somarCarros(S.teams[t.id])+'</span></button>';
+  }
+  var direita = (isEd ? '' : '<button class="refbtn" onclick="carregar()">Atualizar</button>') +
+    '<div class="badges">' +
+    '<div class="badge"><div class="n">'+grand+'</div><div class="l">Adesivados</div></div>' +
+    '<div class="badge"><div class="n">70</div><div class="l">Meta/Equipe</div></div>' +
+    '<div class="badge"><div class="n">'+Math.max(0,META_TOTAL-grand)+'</div><div class="l">Restantes</div></div>' +
+    '</div><button class="back-btn" onclick="irSelect()">Sair</button>';
+  var semanaHTML = isEd ?
+    '<input class="wkinput" id="sem" value="'+S.semana+'" placeholder="Ex: Semana 1" oninput="atuSemana(this.value)">' :
+    '<span class="wkval">'+(S.semana||"---")+'</span>';
+  return '<div style="min-height:100vh;background:#070c14">' +
+    '<header class="hdr"><div class="wrap hdr-inner">' +
+    '<div class="hdr-left"><div style="font-size:2.4rem">&#127942;</div>' +
+    '<div><h1>Competicao<span>Adesivagem de Carros</span></h1></div>' +
+    '<span class="mbadge '+(isEd?"ed":"vw")+'">'+(isEd?"Editor":"Visualizacao")+'</span>' +
+    '</div><div class="hdr-right">'+direita+'</div>' +
+    '</div></header>' +
+    '<div class="wrap wkbar"><span class="wklbl">Semana:</span>'+semanaHTML+'</div>' +
+    '<div class="wrap tabs-wrap"><div class="tabs">'+tabs+'</div></div>' +
+    '<div class="wrap panels">'+painel+'</div>' +
+    lb() + modalPlaca() +
+    '<div class="toast '+S.toastType+(S.toastShow?" show":"")+'">'+S.toastMsg+'</div>' +
+    '</div>';
+}
+
+function painelRanking(grand, pct) {
+  var sorted = ranking(S.rankView);
+  var max = sorted.length > 0 ? sorted[0].total : 1;
+  var linhas = "";
+  for (var i=0; i<sorted.length; i++) {
+    var t = sorted[i];
+    var pos = i+1;
+    var cl = pos===1?"p1":pos===2?"p2":pos===3?"p3":"po";
+    var bw = max > 0 ? Math.round(t.total/max*100) : 0;
+    linhas += '<div class="rrow" onclick="aba('+t.id+')">' +
+      '<div class="rpos '+cl+'">'+pos+'</div>' +
+      '<div class="rname">'+t.name+'</div>' +
+      '<div class="rbarw"><div class="rbar"><div class="rbarf" style="width:'+bw+'%"></div></div></div>' +
+      '<div class="rcars">'+t.total+'</div>' +
+      '<div class="rpct">'+(S.rankView==="week"?t.total+" c":Math.round(t.total/META*100)+"%")+'</div>' +
+      '</div>';
+  }
+  return '<div>' +
+    '<div class="ph"><div class="pname">Ranking Geral</div>' +
+    '<div class="sbtns">' +
+    '<button class="sbtn s1" onclick="copiar(\'week\')">Copiar Semana</button>' +
+    '<button class="sbtn s2" onclick="copiar(\'total\')">Copiar Total</button>' +
+    '</div></div>' +
+    '<div class="rtoggle">' +
+    '<button class="rtbtn '+(S.rankView==="total"?"active":"")+'" onclick="modoRank(\'total\')">Total</button>' +
+    '<button class="rtbtn '+(S.rankView==="week"?"active":"")+'" onclick="modoRank(\'week\')">Semana</button>' +
+    '</div>' +
+    '<div class="rbox"><div class="rbhdr">' +
+    '<h2>'+(S.rankView==="week"?"Ranking Semana":"Classificacao Total")+'</h2>' +
+    '<span class="wkbadge">'+(S.semana||"---")+'</span>' +
+    '</div>'+linhas+'</div>' +
+    '<div class="prog-card">' +
+    '<div class="prg-lbl"><span>Progresso Geral</span><span>'+pct+'%</span></div>' +
+    '<div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div>' +
+    '<div class="note">META: 70 POR EQUIPE - 630 NO TOTAL</div>' +
+    '</div></div>';
+}
+
+function painelEditor(t) {
+  var d = S.teams[t.id];
+  var tot = somarCarros(d);
+  var pct = Math.min(100, Math.round(tot/META*100));
+  var wi = S.wi[t.id];
+  var semanas = d.weeks.length === 0 ? '<span class="empty">Sem registros</span>' : "";
+  for (var i=0; i<d.weeks.length; i++) {
+    var w = d.weeks[i];
+    semanas += '<div class="wkcard"><div><div class="wl">'+w.name+'</div><div class="wc">'+w.cars+'</div></div>' +
+      '<button class="wk-del" onclick="delSemana('+t.id+','+i+')">X</button></div>';
+  }
+  var fotos = "";
+  for (var j=0; j<d.photos.length; j++) {
+    var p = d.photos[j];
+    fotos += '<div class="pitem" onclick="abrirFoto('+t.id+','+j+')">' +
+      '<img src="'+p.src+'" alt="">' +
+      '<button class="pdel" onclick="event.stopPropagation();delFoto('+t.id+','+j+')">X</button>' +
+      (p.plate ? '<div class="ptag">'+p.plate+'</div>' : (p.week ? '<div class="ptag">'+p.week+'</div>' : '')) +
+      '</div>';
+  }
+  var placas = "";
+  if (d.plates && d.plates.length > 0) {
+    placas = '<div style="margin-top:24px"><div class="sec-title">Placas ('+d.plates.length+')</div><div class="plates-grid">';
+    for (var k=0; k<d.plates.length; k++) {
+      placas += '<div class="plate-tag"><span>'+d.plates[k].plate+'</span></div>';
+    }
+    placas += '</div></div>';
+  }
+  return '<div>' +
+    '<div class="ph"><div class="pname"><span>'+t.name+'</span></div>' +
+    '<div class="stats">' +
+    '<div class="stat p"><div class="v">'+tot+'</div><div class="l">Adesivados</div></div>' +
+    '<div class="stat s"><div class="v">'+Math.max(0,META-tot)+'</div><div class="l">Faltam</div></div>' +
+    '<div class="stat s"><div class="v">'+d.photos.length+'</div><div class="l">Fotos</div></div>' +
+    '</div></div>' +
+    '<div class="prg"><div class="prg-lbl"><span>Progresso</span><span>'+pct+'%</span></div>' +
+    '<div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div></div>' +
+    '<div class="addwk"><span class="lbl">+ Registrar</span>' +
+    '<input class="wni" id="wn'+t.id+'" value="'+wi.name+'" placeholder="Semana 1" onkeydown="if(event.key===\'Enter\')addSemana('+t.id+')">' +
+    '<input class="cni" id="wc'+t.id+'" type="number" value="'+wi.cars+'" placeholder="00" min="0" max="70" onkeydown="if(event.key===\'Enter\')addSemana('+t.id+')">' +
+    '<button class="btn-add" onclick="addSemana('+t.id+')">Adicionar</button>' +
+    '</div>' +
+    '<div class="sec-title">Historico</div><div class="wkgrid">'+semanas+'</div>' +
+    '<div class="sec-title" style="margin-bottom:12px">Fotos ('+d.photos.length+')</div>' +
+    '<div class="pgrid">'+fotos+'</div>' +
+    '<div class="upzone" onclick="document.getElementById(\'up'+t.id+'\').click()">' +
+    '<div class="ui">&#128247;</div><p>Adicionar fotos</p>' +
+    '<input id="up'+t.id+'" type="file" accept="image/*" multiple style="display:none" onchange="uploadFoto(event,'+t.id+')">' +
+    '</div>'+placas+'</div>';
+}
+
+function painelViewer(t) {
+  var d = S.teams[t.id];
+  var tot = somarCarros(d);
+  var pct = Math.min(100, Math.round(tot/META*100));
+  var semanas = d.weeks.length === 0 ? '<span class="empty">Sem registros</span>' : "";
+  for (var i=0; i<d.weeks.length; i++) {
+    semanas += '<div class="wkcard"><div class="wl">'+d.weeks[i].name+'</div><div class="wc">'+d.weeks[i].cars+'</div></div>';
+  }
+  var fotos = d.photos.length === 0 ? '<span class="empty">Sem fotos</span>' : '<div class="pgrid">';
+  for (var j=0; j<d.photos.length; j++) {
+    var p = d.photos[j];
+    fotos += '<div class="pitem" onclick="abrirFoto('+t.id+','+j+')">' +
+      '<img src="'+p.src+'" alt="">' +
+      (p.plate ? '<div class="ptag">'+p.plate+'</div>' : (p.week ? '<div class="ptag">'+p.week+'</div>' : '')) +
+      '</div>';
+  }
+  if (d.photos.length > 0) fotos += '</div>';
+  var placas = "";
+  if (d.plates && d.plates.length > 0) {
+    placas = '<div style="margin-top:24px"><div class="sec-title">Placas ('+d.plates.length+')</div><div class="plates-grid">';
+    for (var k=0; k<d.plates.length; k++) {
+      placas += '<div class="plate-tag"><span>'+d.plates[k].plate+'</span></div>';
+    }
+    placas += '</div></div>';
+  }
+  return '<div>' +
+    '<div class="ph"><div class="pname"><span>'+t.name+'</span></div>' +
+    '<div class="stats">' +
+    '<div class="stat p"><div class="v">'+tot+'</div><div class="l">Adesivados</div></div>' +
+    '<div class="stat s"><div class="v">'+Math.max(0,META-tot)+'</div><div class="l">Faltam</div></div>' +
+    '<div class="stat s"><div class="v">'+d.photos.length+'</div><div class="l">Fotos</div></div>' +
+    '</div></div>' +
+    '<div class="prg"><div class="prg-lbl"><span>Progresso</span><span>'+pct+'%</span></div>' +
+    '<div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div></div>' +
+    '<div class="sec-title">Historico</div><div class="wkgrid" style="margin-bottom:22px">'+semanas+'</div>' +
+    '<div class="sec-title" style="margin-bottom:12px">Fotos ('+d.photos.length+')</div>' +
+    fotos+placas+'</div>';
+}
+
+function lb() {
+  if (!S.lightbox) return '';
+  return '<div class="lb open" onclick="fecharFoto()"><button class="lbclose" onclick="fecharFoto()">X</button>' +
+    '<img src="'+S.lightbox+'" alt="" onclick="event.stopPropagation()"></div>';
+}
+
+function modalPlaca() {
+  if (!S.modal) return '';
+  var m = S.modal;
+  return '<div class="modal-overlay"><div class="modal-box">' +
+    '<h3>Registrar Placa</h3>' +
+    '<p>Foto '+(m.idx+1)+' de '+m.total+' - '+(m.week||"sem semana")+'</p>' +
+    '<img src="'+m.src+'" style="width:100%;border-radius:8px;margin-bottom:14px;max-height:180px;object-fit:cover">' +
+    '<input class="plate-inp" id="pinp" value="'+S.plateInput+'" placeholder="ABC-1234" maxlength="8" ' +
+    'oninput="S.plateInput=this.value.toUpperCase();S.plateErr=\'\'" ' +
+    'onkeydown="if(event.key===\'Enter\')confirmarPlaca()">' +
+    (S.plateErr ? '<div class="plate-err">'+S.plateErr+'</div>' : '') +
+    '<div class="modal-btns">' +
+    '<button class="mbtn-cancel" onclick="pularPlaca()">Pular</button>' +
+    '<button class="mbtn-confirm" onclick="confirmarPlaca()">Confirmar</button>' +
+    '</div></div></div>';
+}
+</script>
+
+  <script>
+function irSelect() { S.mode="select"; render(); }
+function irViewer() { S.mode="viewer"; carregar(); }
+function irLogin() { S.mode="login"; S.pwErr=false; render(); }
+function login() {
+  var inp = document.getElementById("pw");
+  var pw = inp ? inp.value : "";
+  if (pw === SENHA) { S.mode="editor"; S.pwErr=false; carregar(); }
+  else { S.pwErr=true; render(); }
+}
+function aba(t) { S.tab=t; render(); }
+function modoRank(v) { S.rankView=v; render(); }
+function atuSemana(v) { S.semana=v; salvar(); }
+
+function addSemana(tid) {
+  var n = document.getElementById("wn"+tid);
+  var c = document.getElementById("wc"+tid);
+  var nome = n ? n.value.trim() : "";
+  var cars = c ? parseInt(c.value) : 0;
+  if (!cars || cars <= 0) return;
+  var wname = nome || "Semana "+(S.teams[tid].weeks.length+1);
+  S.teams[tid].weeks.push({name:wname, cars:cars});
+  S.wi[tid] = {name:"", cars:""};
+  salvar(); render();
+}
+
+function delSemana(tid, idx) {
+  S.teams[tid].weeks.splice(idx, 1);
+  salvar(); render();
+}
+
+function uploadFoto(event, tid) {
+  var files = Array.from(event.target.files);
+  if (!files.length) return;
+  var week = (S.wi[tid] && S.wi[tid].name ? S.wi[tid].name.trim() : "") || S.semana || "";
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    S.modal = {tid:tid, src:e.target.result, week:week, files:files, idx:0, total:files.length};
+    S.plateInput = ""; S.plateErr = "";
+    render();
+    setTimeout(function() { var p=document.getElementById("pinp"); if(p) p.focus(); }, 100);
+  };
+  reader.readAsDataURL(files[0]);
+  event.target.value = "";
+}
+
+function confirmarPlaca() {
+  if (!S.modal) return;
+  var inp = document.getElementById("pinp");
+  var placa = (inp ? inp.value : S.plateInput).trim().toUpperCase();
+  if (!placa) { S.plateErr="Digite a placa!"; render(); return; }
+  var todas = todasPlacas();
+  for (var i=0; i<todas.length; i++) {
+    if (todas[i].plate === placa) {
+      S.plateErr = "Ja cadastrada por: "+todas[i].time;
+      render(); return;
+    }
+  }
+  var m = S.modal;
+  S.teams[m.tid].photos.push({src:m.src, week:m.week, plate:placa});
+  S.teams[m.tid].plates.push({plate:placa, week:m.week});
+  toast(placa+" registrada!", "ok");
+  proximaFoto();
+}
+
+function pularPlaca() {
+  if (!S.modal) return;
+  var m = S.modal;
+  S.teams[m.tid].photos.push({src:m.src, week:m.week, plate:""});
+  proximaFoto();
+}
+
+function proximaFoto() {
+  salvar();
+  var m = S.modal;
+  var next = m.idx + 1;
+  if (next < m.total) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      S.modal = {tid:m.tid, src:e.target.result, week:m.week, files:m.files, idx:next, total:m.total};
+      S.plateInput = ""; S.plateErr = "";
+      render();
+      setTimeout(function() { var p=document.getElementById("pinp"); if(p) p.focus(); }, 100);
+    };
+    reader.readAsDataURL(m.files[next]);
+  } else {
+    S.modal = null; render();
+  }
+}
+
+function delFoto(tid, idx) {
+  var foto = S.teams[tid].photos[idx];
+  S.teams[tid].photos.splice(idx, 1);
+  if (foto && foto.plate) {
+    S.teams[tid].plates = S.teams[tid].plates.filter(function(p) { return p.plate !== foto.plate; });
+  }
+  salvar(); render();
+}
+
+function abrirFoto(tid, idx) {
+  var p = S.teams[tid].photos[idx];
+  if (p) { S.lightbox = p.src; render(); }
+}
+function fecharFoto() { S.lightbox = null; render(); }
+
+function copiar(tipo) {
+  var sorted = ranking(tipo);
+  var maxT = sorted.length > 0 ? sorted[0].total : 1;
+  var txt = tipo==="week" ? "RANKING SEMANA - "+(S.semana||"---")+"\n" : "RANKING TOTAL - "+(S.semana||"---")+"\n";
+  txt += "================\n";
+  for (var i=0; i<sorted.length; i++) {
+    txt += (i+1)+"o "+sorted[i].name+"\n   "+sorted[i].total+" carros\n";
+  }
+  txt += "================\n";
+  txt += tipo==="week" ? "Total semana: "+sorted.reduce(function(s,t){return s+t.total;},0)+"\n" : "Meta: 70/equipe | Total: "+totalGeral()+"\n";
+  navigator.clipboard.writeText(txt).then(function() { alert("Copiado! Cole no WhatsApp."); }).catch(function() { prompt("Copie:", txt); });
+}
+
 render();
 </script>
 </body>
 </html>
-
