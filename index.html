@@ -4,10 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Competição de Adesivagem</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#070c14;color:#e8eaf0;font-family:'Barlow',sans-serif;min-height:100vh;}
@@ -31,13 +30,11 @@ h1 span{display:block;font-size:.75rem;font-family:'Barlow Condensed',sans-serif
 .badge .l{font-size:.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
 .wkbar{padding:10px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
 .wklbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.wkinput{background:var(--card);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.92rem;padding:5px 12px;border-radius:8px;outline:none;width:200px;transition:border-color .2s;}
-.wkinput:focus{border-color:var(--accent);}
+.wkinput{background:var(--card);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.92rem;padding:5px 12px;border-radius:8px;outline:none;width:200px;}
 .wkval{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;color:var(--text);background:var(--card);border:1px solid var(--border);padding:5px 14px;border-radius:8px;}
-.tabs-wrap{padding:0 24px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--accent) transparent;}
+.tabs-wrap{padding:0 24px;overflow-x:auto;scrollbar-width:thin;}
 .tabs{display:flex;gap:4px;min-width:max-content;border-bottom:2px solid var(--border);}
 .tab{background:none;border:1.5px solid transparent;border-bottom:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:7px 13px;border-radius:8px 8px 0 0;position:relative;top:2px;transition:all .2s;white-space:nowrap;}
-.tab:hover{color:var(--text);background:var(--card);}
 .tab.active{color:var(--accent);background:var(--surface);border-color:var(--border);border-bottom-color:var(--surface);}
 .tbadge{display:inline-block;background:var(--accent2);color:#fff;font-size:.64rem;padding:1px 5px;border-radius:20px;margin-left:4px;font-weight:700;}
 .tab.active .tbadge{background:var(--accent);color:var(--bg);}
@@ -54,22 +51,18 @@ h1 span{display:block;font-size:.75rem;font-family:'Barlow Condensed',sans-serif
 .prg{margin-bottom:22px;}
 .prg-lbl{display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
 .prg-track{background:var(--card);border-radius:100px;height:9px;border:1px solid var(--border);overflow:hidden;}
-.prg-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .8s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;}
-.prg-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);animation:sh 2s linear infinite;}
-@keyframes sh{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
+.prg-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .8s cubic-bezier(.4,0,.2,1);}
 .addwk{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px;margin-bottom:22px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
 .addwk .lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.wni{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.9rem;padding:6px 10px;border-radius:7px;width:136px;outline:none;transition:border-color .2s;}
-.wni:focus{border-color:var(--accent);}
-.cni{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:2px;padding:6px 10px;border-radius:7px;width:80px;outline:none;text-align:center;transition:border-color .2s;}
-.cni:focus{border-color:var(--accent);}
+.wni{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.9rem;padding:6px 10px;border-radius:7px;width:136px;outline:none;}
+.cni{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.15rem;padding:6px 10px;border-radius:7px;width:80px;outline:none;text-align:center;}
 .btn-add{background:var(--accent);color:var(--bg);border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:2px;padding:8px 16px;border-radius:7px;}
 .sec-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
 .wkgrid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
 .wkcard{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:7px 12px;display:flex;align-items:center;gap:8px;}
 .wkcard .wl{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
 .wkcard .wc{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--accent);line-height:1;}
-.wk-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:2px 4px;border-radius:4px;}
+.wk-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:2px 4px;}
 .empty{color:var(--muted);font-size:.78rem;font-family:'Barlow Condensed',sans-serif;letter-spacing:1.5px;text-transform:uppercase;}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:13px;}
 .pitem{position:relative;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;}
@@ -79,6 +72,9 @@ h1 span{display:block;font-size:.75rem;font-family:'Barlow Condensed',sans-serif
 .upzone{border:2px dashed var(--border);border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:var(--card);user-select:none;}
 .upzone .ui{font-size:1.6rem;margin-bottom:4px;}
 .upzone p{font-family:'Barlow Condensed',sans-serif;font-size:.76rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.plates-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:22px;}
+.plate-tag{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:5px 10px;}
+.plate-tag span{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--text);}
 .rtoggle{display:flex;gap:7px;margin-bottom:14px;}
 .rtbtn{background:var(--card);border:1.5px solid var(--border);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;padding:6px 15px;border-radius:7px;cursor:pointer;}
 .rtbtn.active{background:var(--accent);color:var(--bg);border-color:var(--accent);}
@@ -90,7 +86,7 @@ h1 span{display:block;font-size:.75rem;font-family:'Barlow Condensed',sans-serif
 .rrow:last-child{border-bottom:none;}
 .rpos{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;width:30px;text-align:center;flex-shrink:0;}
 .rpos.p1{color:var(--gold)}.rpos.p2{color:var(--silver)}.rpos.p3{color:var(--bronze)}.rpos.po{color:var(--muted);}
-.rname{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.92rem;letter-spacing:1px;flex:1;}
+.rname{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.92rem;flex:1;}
 .rbarw{flex:2;display:flex;align-items:center;gap:6px;}
 .rbar{flex:1;height:6px;background:var(--surface);border-radius:100px;overflow:hidden;}
 .rbarf{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent2),var(--accent));}
@@ -117,349 +113,49 @@ h1 span{display:block;font-size:.75rem;font-family:'Barlow Condensed',sans-serif
 .toast.ok{background:rgba(59,158,255,.2);border:1px solid var(--accent);color:var(--accent);}
 .toast.err{background:rgba(232,57,42,.2);border:1px solid #e8392a;color:#e8392a;}
 .toast.show{opacity:1;}
-.refbtn{background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:5px 11px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:5px;}
 .back-btn{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:5px 11px;border-radius:7px;}
+.refbtn{background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:5px 11px;border-radius:7px;cursor:pointer;}
 .sel-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:20px;background:var(--bg);}
 .sel-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:10px;}
 .sel-btn{border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;padding:14px 30px;border-radius:10px;}
 .sel-btn.vw{background:linear-gradient(135deg,#0d3a6e,#1a5fb4);color:#e8eaf0;}
 .sel-btn.ed{background:linear-gradient(135deg,#1a5fb4,#3b9eff);color:#070c14;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;width:100%;max-width:360px;}
+.modal-box h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--accent);margin-bottom:6px;}
+.modal-box p{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:16px;}
+.plate-inp{background:var(--surface);border:1.5px solid var(--border);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:4px;padding:10px 14px;border-radius:8px;width:100%;outline:none;text-align:center;text-transform:uppercase;margin-bottom:10px;}
+.plate-err{color:#e8392a;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;text-align:center;}
+.modal-btns{display:flex;gap:10px;}
+.modal-btns button{flex:1;border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;padding:10px;border-radius:8px;}
+.mbtn-cancel{background:var(--surface);color:var(--muted);}
+.mbtn-confirm{background:linear-gradient(135deg,#1a5fb4,#3b9eff);color:var(--bg);}
 @media(max-width:720px){.hdr,.wkbar,.tabs-wrap,.panels{padding-left:14px;padding-right:14px;}h1{font-size:1.6rem;}.pgrid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}}
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<script type="text/babel">
-const { useState, useEffect, useRef, useCallback } = React;
-const TEAMS = [
-  { id: 0, name: "Alberto & Gilson" },
-  { id: 1, name: "Gemildo" },
-  { id: 2, name: "Jesion" },
-  { id: 3, name: "Nogueira & Feitosa" },
-  { id: 4, name: "Miranda" },
-  { id: 5, name: "Wberthyer" },
-  { id: 6, name: "Paulo" },
-  { id: 7, name: "Zé Roberto" },
-  { id: 8, name: "Henrique" },
-];
-const META = 70;
-const META_TOTAL = META * TEAMS.length;
-const EDITOR_PASSWORD = "roriz2025";
-const KEY = "comp_roriz_v3";
-
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open("CompRorizDB", 1);
-    req.onupgradeneeded = e => e.target.result.createObjectStore("store");
-    req.onsuccess = e => resolve(e.target.result);
-    req.onerror = reject;
-  });
-}
-async function idbSet(value) {
-  try {
-    const db = await openDB();
-    return new Promise((res, rej) => {
-      const tx = db.transaction("store", "readwrite");
-      tx.objectStore("store").put(JSON.stringify(value), KEY);
-      tx.oncomplete = res; tx.onerror = rej;
-    });
-  } catch(e) {}
-}
-async function idbGet() {
-  try {
-    const db = await openDB();
-    return new Promise((res, rej) => {
-      const tx = db.transaction("store", "readonly");
-      const req = tx.objectStore("store").get(KEY);
-      req.onsuccess = e => res(e.target.result ? JSON.parse(e.target.result) : null);
-      req.onerror = rej;
-    });
-  } catch(e) { return null; }
-}
-async function persistSave(data) {
-  await idbSet(data);
-  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {}
-}
-async function persistLoad() {
-  try { const d = await idbGet(); if (d) return d; } catch(e) {}
-  try { const s = localStorage.getItem(KEY); if (s) return JSON.parse(s); } catch(e) {}
-  return null;
-}
-const sumCars = t => (t?.weeks||[]).reduce((s,w)=>s+(w.cars||0),0);
-const grandTotal = ts => TEAMS.reduce((s,t)=>s+sumCars(ts[t.id]),0);
-const medals = ["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣"];
-const defTeams = () => { const t={}; TEAMS.forEach(tm=>{t[tm.id]={weeks:[],photos:[]}}); return t; };
-const copyText = t => navigator.clipboard.writeText(t).then(()=>alert("✅ Copiado! Cole no WhatsApp.")).catch(()=>prompt("Copie:",t));
-
-function App() {
-  const [mode, setMode] = useState("select");
-  const [pw, setPw] = useState(""); const [pwErr, setPwErr] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [activeTab, setActiveTab] = useState("ranking");
-  const [rankView, setRankView] = useState("total");
-  const [currentWeek, setCurrentWeek] = useState("");
-  const [teams, setTeams] = useState(defTeams);
-  const [weekInputs, setWeekInputs] = useState(()=>{const w={};TEAMS.forEach(tm=>{w[tm.id]={name:"",cars:""}});return w;});
-  const [lightbox, setLightbox] = useState(null);
-  const [toast, setToast] = useState({show:false,msg:"",type:"ok"});
-  const saveTimer = useRef(null); const toastTimer = useRef(null);
-
-  const showToast = (msg, type="ok") => {
-    setToast({show:true,msg,type});
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(()=>setToast(t=>({...t,show:false})),2500);
-  };
-  const loadData = useCallback(async () => {
-    try {
-      const saved = await persistLoad();
-      if(saved) {
-        if(saved.teams) setTeams(prev=>{const m={...prev};TEAMS.forEach(tm=>{if(saved.teams[tm.id])m[tm.id]=saved.teams[tm.id]});return m;});
-        if(saved.currentWeek!==undefined) setCurrentWeek(saved.currentWeek);
-      }
-    } catch(e) {}
-    setLoaded(true);
-  },[]);
-  useEffect(()=>{loadData();},[loadData]);
-
-  const save = useCallback((newTeams, newWeek) => {
-    clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(async()=>{
-      try { await persistSave({teams:newTeams,currentWeek:newWeek}); showToast("✓ Salvo"); }
-      catch(e) { showToast("Erro ao salvar","err"); }
-    },500);
-  },[]);
-  const updateTeams = useCallback(fn=>{
-    setTeams(prev=>{const next=fn(prev);save(next,currentWeek);return next;});
-  },[currentWeek,save]);
-  const updateWeek = val => { setCurrentWeek(val); save(teams,val); };
-  const login = () => { if(pw===EDITOR_PASSWORD){setMode("editor");setPwErr(false);setPw("");}else{setPwErr(true);setPw("");} };
-  const addWeek = teamId => {
-    const {name,cars} = weekInputs[teamId];
-    const n = parseInt(cars); if(!n||n<=0) return;
-    const wname = name.trim()||`Semana ${teams[teamId].weeks.length+1}`;
-    updateTeams(prev=>({...prev,[teamId]:{...prev[teamId],weeks:[...prev[teamId].weeks,{name:wname,cars:n}]}}));
-    setWeekInputs(prev=>({...prev,[teamId]:{name:"",cars:""}}));
-  };
-  const deleteWeek = (teamId,idx) => updateTeams(prev=>({...prev,[teamId]:{...prev[teamId],weeks:prev[teamId].weeks.filter((_,i)=>i!==idx)}}));
-  const handleUpload = (e, teamId) => {
-    const files = Array.from(e.target.files); if(!files.length) return;
-    const weekName = weekInputs[teamId]?.name?.trim()||currentWeek||"";
-    let done=0;
-    files.forEach(file=>{
-      const reader=new FileReader();
-      reader.onload=ev=>{
-        updateTeams(prev=>({...prev,[teamId]:{...prev[teamId],photos:[...prev[teamId].photos,{src:ev.target.result,week:weekName}]}}));
-        done++; if(done===files.length) showToast(`✓ ${files.length} foto(s) adicionada(s)`);
-      };
-      reader.readAsDataURL(file);
-    });
-    e.target.value="";
-  };
-  const deletePhoto = (teamId,idx) => updateTeams(prev=>({...prev,[teamId]:{...prev[teamId],photos:prev[teamId].photos.filter((_,i)=>i!==idx)}}));
-  const getWeekCars = teamId => {
-    const wks=teams[teamId]?.weeks||[];
-    const match=wks.filter(w=>w.name.trim()===currentWeek.trim());
-    if(match.length) return match.reduce((s,w)=>s+w.cars,0);
-    if(wks.length) return wks[wks.length-1].cars;
-    return 0;
-  };
-  const getSorted = m => TEAMS.map(t=>({...t,total:m==="week"?getWeekCars(t.id):sumCars(teams[t.id])})).sort((a,b)=>b.total-a.total);
-  const genText = type => {
-    const sorted=getSorted(type); const maxT=sorted[0]?.total||1;
-    let txt=type==="week"?`📅 *RANKING DA SEMANA — ${currentWeek||"—"}*\n`:`🏆 *RANKING TOTAL — ${currentWeek||"—"}*\n`;
-    txt+=`━━━━━━━━━━━━━━━━\n`;
-    sorted.forEach((t,i)=>{txt+=`${medals[i]} ${t.name}\n   ${t.total} carros ${"█".repeat(Math.min(10,Math.round(t.total/(maxT||1)*10)))}\n`;});
-    txt+=`━━━━━━━━━━━━━━━━\n`;
-    txt+=type==="week"?`📅 Total na semana: ${sorted.reduce((s,t)=>s+t.total,0)}\n`:`🎯 Meta: 70/equipe | Total: ${grandTotal(teams)}\n`;
-    copyText(txt);
-  };
-  const isEditor=mode==="editor";
-  const grand=grandTotal(teams);
-  const overallPct=Math.min(100,Math.round(grand/META_TOTAL*100));
-
-  if(mode==="select") return (
-    <div className="sel-screen">
-      <div style={{fontSize:"3.2rem"}}>🏆</div>
-      <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:"2rem",letterSpacing:"3px",color:"var(--accent)",textAlign:"center",lineHeight:1}}>
-        Competição de Adesivagem
-        <div style={{fontSize:".75rem",fontFamily:"'Barlow Condensed',sans-serif",color:"var(--muted)",letterSpacing:"5px",marginTop:6}}>JOAQUIM RORIZ NETO</div>
-      </div>
-      <div className="sel-btns">
-        <button className="sel-btn vw" onClick={()=>{setMode("viewer");loadData();}}>👁️ Visualizar</button>
-        <button className="sel-btn ed" onClick={()=>setMode("editor-login")}>✏️ Editar (Admin)</button>
-      </div>
-    </div>
-  );
-  if(mode==="editor-login") return (
-    <div style={{minHeight:"100vh",background:"var(--bg)"}}>
-      <div className="pwscreen">
-        <div className="pwbox">
-          <div style={{fontSize:"2.2rem",marginBottom:10}}>🔐</div>
-          <h2>Acesso Editor</h2>
-          <p>Digite a senha para editar</p>
-          <input className="pwinp" type="password" value={pw} onChange={e=>{setPw(e.target.value);setPwErr(false);}} onKeyDown={e=>e.key==="Enter"&&login()} placeholder="••••••••" autoFocus />
-          {pwErr&&<div className="pwerr">Senha incorreta</div>}
-          <button className="pwbtn" onClick={login}>Entrar</button>
-          <div style={{marginTop:14}}><button className="back-btn" onClick={()=>setMode("select")}>← Voltar</button></div>
-        </div>
-      </div>
-    </div>
-  );
-  if(!loaded) return <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:"2rem",color:"var(--accent)"}}>Carregando...</div>;
-  return (
-    <div style={{minHeight:"100vh",background:"var(--bg)"}}>
-      <header className="hdr">
-        <div className="wrap hdr-inner">
-          <div className="hdr-left">
-            <div className="trophy">🏆</div>
-            <div><h1>Competição<span>Adesivagem de Carros</span></h1></div>
-            <span className={`mbadge ${isEditor?"ed":"vw"}`}>{isEditor?"✏️ Editor":"👁️ Visualização"}</span>
-          </div>
-          <div className="hdr-right">
-            {!isEditor&&<button className="refbtn" onClick={loadData}>↻ Atualizar</button>}
-            <div className="badges">
-              <div className="badge"><div className="n">{grand}</div><div className="l">Adesivados</div></div>
-              <div className="badge"><div className="n">70</div><div className="l">Meta/Equipe</div></div>
-              <div className="badge"><div className="n">{Math.max(0,META_TOTAL-grand)}</div><div className="l">Restantes</div></div>
-            </div>
-            <button className="back-btn" onClick={()=>setMode("select")}>← Sair</button>
-          </div>
-        </div>
-      </header>
-      <div className="wrap wkbar">
-        <span className="wklbl">📅 Semana:</span>
-        {isEditor?<input className="wkinput" value={currentWeek} onChange={e=>updateWeek(e.target.value)} placeholder="Ex: Semana 1"/>:<span className="wkval">{currentWeek||"—"}</span>}
-      </div>
-      <div className="wrap tabs-wrap">
-        <div className="tabs">
-          <button className={`tab${activeTab==="ranking"?" active":""}`} onClick={()=>setActiveTab("ranking")}>🏆 Ranking</button>
-          {TEAMS.map(t=>(
-            <button key={t.id} className={`tab${activeTab===t.id?" active":""}`} onClick={()=>setActiveTab(t.id)}>
-              {t.name}<span className="tbadge">{sumCars(teams[t.id])}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="wrap panels">
-        {activeTab==="ranking"&&(
-          <div>
-            <div className="ph">
-              <div className="pname">🏆 <span>Ranking</span> Geral</div>
-              <div className="sbtns">
-                <button className="sbtn s1" onClick={()=>genText("week")}>📋 Copiar Semana</button>
-                <button className="sbtn s2" onClick={()=>genText("total")}>🏆 Copiar Total</button>
-              </div>
-            </div>
-            <div className="rtoggle">
-              <button className={`rtbtn${rankView==="total"?" active":""}`} onClick={()=>setRankView("total")}>📊 Total</button>
-              <button className={`rtbtn${rankView==="week"?" active":""}`} onClick={()=>setRankView("week")}>📅 Semana</button>
-            </div>
-            <div className="rbox">
-              <div className="rbhdr"><h2>{rankView==="week"?"Ranking da Semana":"Classificação Total"}</h2><span className="wkbadge">{currentWeek||"—"}</span></div>
-              {getSorted(rankView).map((t,i)=>{
-                const pos=i+1,pc=pos===1?"p1":pos===2?"p2":pos===3?"p3":"po",medal=pos===1?"🥇":pos===2?"🥈":pos===3?"🥉":pos;
-                const max=getSorted(rankView)[0]?.total||1,bw=Math.round(t.total/max*100);
-                return(<div key={t.id} className="rrow" onClick={()=>setActiveTab(t.id)}>
-                  <div className={`rpos ${pc}`}>{medal}</div>
-                  <div className="rname">{t.name}</div>
-                  <div className="rbarw"><div className="rbar"><div className="rbarf" style={{width:`${bw}%`}}/></div></div>
-                  <div className="rcars">{t.total}</div>
-                  <div className="rpct">{rankView==="week"?`${t.total} 🚗`:`${Math.round(t.total/META*100)}%`}</div>
-                </div>);
-              })}
-            </div>
-            <div className="prog-card">
-              <div className="prg-lbl"><span>Progresso Geral</span><span>{overallPct}%</span></div>
-              <div className="prg-track"><div className="prg-fill" style={{width:`${overallPct}%`}}/></div>
-              <div className="note">META: 70 CARROS POR EQUIPE · 630 NO TOTAL</div>
-            </div>
-          </div>
-        )}
-        {TEAMS.map(t=>activeTab===t.id&&(isEditor?(
-          <div key={t.id}>
-            <div className="ph">
-              <div className="pname"><span>{t.name}</span></div>
-              <div className="stats">
-                <div className="stat p"><div className="v">{sumCars(teams[t.id])}</div><div className="l">Adesivados</div></div>
-                <div className="stat s"><div className="v">{Math.max(0,META-sumCars(teams[t.id]))}</div><div className="l">Faltam</div></div>
-                <div className="stat s"><div className="v">{teams[t.id].photos.length}</div><div className="l">📸 Fotos</div></div>
-              </div>
-            </div>
-            <div className="prg">
-              <div className="prg-lbl"><span>Progresso</span><span>{Math.min(100,Math.round(sumCars(teams[t.id])/META*100))}% da meta</span></div>
-              <div className="prg-track"><div className="prg-fill" style={{width:`${Math.min(100,Math.round(sumCars(teams[t.id])/META*100))}%`}}/></div>
-            </div>
-            <div className="addwk">
-              <span className="lbl">+ Registrar</span>
-              <input className="wni" value={weekInputs[t.id].name} onChange={e=>setWeekInputs(prev=>({...prev,[t.id]:{...prev[t.id],name:e.target.value}}))} placeholder="Ex: Semana 1" onKeyDown={e=>e.key==="Enter"&&addWeek(t.id)}/>
-              <input className="cni" type="number" value={weekInputs[t.id].cars} onChange={e=>setWeekInputs(prev=>({...prev,[t.id]:{...prev[t.id],cars:e.target.value}}))} placeholder="00" min="0" max="70" onKeyDown={e=>e.key==="Enter"&&addWeek(t.id)}/>
-              <button className="btn-add" onClick={()=>addWeek(t.id)}>Adicionar</button>
-            </div>
-            <div className="sec-title">📅 Histórico</div>
-            <div className="wkgrid">
-              {teams[t.id].weeks.length===0?<span className="empty">Nenhuma semana registrada</span>:teams[t.id].weeks.map((w,i)=>(
-                <div key={i} className="wkcard">
-                  <div><div className="wl">{w.name}</div><div className="wc">{w.cars} 🚗</div></div>
-                  <button className="wk-del" onClick={()=>deleteWeek(t.id,i)}>✕</button>
-                </div>
-              ))}
-            </div>
-            <div className="sec-title" style={{marginBottom:12}}>📸 Fotos {teams[t.id].photos.length>0&&<span style={{color:"var(--accent)",marginLeft:6}}>({teams[t.id].photos.length})</span>}</div>
-            <div className="pgrid">
-              {teams[t.id].photos.map((p,i)=>(
-                <div key={i} className="pitem" onClick={()=>setLightbox(p.src)}>
-                  <img src={p.src} alt=""/>
-                  <button className="pdel" onClick={e=>{e.stopPropagation();deletePhoto(t.id,i);}}>✕</button>
-                  {p.week&&<div className="ptag">{p.week}</div>}
-                </div>
-              ))}
-            </div>
-            <div className="upzone" onClick={()=>document.getElementById(`up-${t.id}`).click()}>
-              <div className="ui">📷</div><p>Clique para adicionar fotos</p>
-              <input id={`up-${t.id}`} type="file" accept="image/*" multiple style={{display:"none"}} onChange={e=>handleUpload(e,t.id)}/>
-            </div>
-          </div>
-        ):(
-          <div key={t.id}>
-            <div className="ph">
-              <div className="pname"><span>{t.name}</span></div>
-              <div className="stats">
-                <div className="stat p"><div className="v">{sumCars(teams[t.id])}</div><div className="l">Adesivados</div></div>
-                <div className="stat s"><div className="v">{Math.max(0,META-sumCars(teams[t.id]))}</div><div className="l">Faltam</div></div>
-                <div className="stat s"><div className="v">{teams[t.id].photos.length}</div><div className="l">📸 Fotos</div></div>
-              </div>
-            </div>
-            <div className="prg">
-              <div className="prg-lbl"><span>Progresso</span><span>{Math.min(100,Math.round(sumCars(teams[t.id])/META*100))}%</span></div>
-              <div className="prg-track"><div className="prg-fill" style={{width:`${Math.min(100,Math.round(sumCars(teams[t.id])/META*100))}%`}}/></div>
-            </div>
-            <div className="sec-title">📅 Histórico</div>
-            <div className="wkgrid" style={{marginBottom:22}}>
-              {teams[t.id].weeks.length===0?<span className="empty">Nenhuma semana registrada</span>:teams[t.id].weeks.map((w,i)=>(
-                <div key={i} className="wkcard"><div className="wl">{w.name}</div><div className="wc">{w.cars} 🚗</div></div>
-              ))}
-            </div>
-            <div className="sec-title" style={{marginBottom:12}}>📸 Fotos {teams[t.id].photos.length>0&&<span style={{color:"var(--accent)",marginLeft:6}}>({teams[t.id].photos.length})</span>}</div>
-            {teams[t.id].photos.length===0?<span className="empty">Nenhuma foto</span>:<div className="pgrid">
-              {teams[t.id].photos.map((p,i)=>(
-                <div key={i} className="pitem" onClick={()=>setLightbox(p.src)}>
-                  <img src={p.src} alt=""/>{p.week&&<div className="ptag">{p.week}</div>}
-                </div>
-              ))}
-            </div>}
-          </div>
-        )))}
-      </div>
-      {lightbox&&(<div className="lb open" onClick={()=>setLightbox(null)}><button className="lbclose" onClick={()=>setLightbox(null)}>✕</button><img src={lightbox} alt="" onClick={e=>e.stopPropagation()}/></div>)}
-      <div className={`toast ${toast.type}${toast.show?" show":""}`}>{toast.msg}</div>
-    </div>
-  );
-}
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+<div id="app"></div>
+  
+  function goSelect(){state.mode="select";render();}
+function goViewer(){state.mode="viewer";loadFromFirebase();}
+function goEditorLogin(){state.mode="editor-login";state.pw="";state.pwErr=false;render();}
+function doLogin(){const inp=document.getElementById('pw-inp');const pw=inp?inp.value:"";if(pw===EDITOR_PASSWORD){state.mode="editor";state.pwErr=false;loadFromFirebase();}else{state.pwErr=true;render();}}
+function reloadData(){loadFromFirebase();}
+function setTab(tab){state.activeTab=tab;render();}
+function setRankView(v){state.rankView=v;render();}
+function updateWeek(val){state.currentWeek=val;scheduleSave();render();}
+function updatePlateInput(val){state.plateInput=val.toUpperCase();state.plateErr="";render();}
+function openLightbox(src){state.lightbox=src;render();}
+function closeLightbox(){state.lightbox=null;render();}
+function addWeek(teamId){const nameEl=document.getElementById(`wk-name-${teamId}`);const carsEl=document.getElementById(`wk-cars-${teamId}`);const name=nameEl?nameEl.value.trim():"";const cars=carsEl?parseInt(carsEl.value):0;if(!cars||cars<=0)return;const wname=name||`Semana ${state.teams[teamId].weeks.length+1}`;state.teams[teamId].weeks.push({name:wname,cars});state.weekInputs[teamId]={name:"",cars:""};scheduleSave();render();}
+function deleteWeek(teamId,idx){state.teams[teamId].weeks.splice(idx,1);scheduleSave();render();}
+function handleUpload(event,teamId){const files=Array.from(event.target.files);if(!files.length)return;const weekName=state.weekInputs[teamId]?.name?.trim()||state.currentWeek||"";const reader=new FileReader();reader.onload=ev=>{state.plateModal={teamId,src:ev.target.result,week:weekName,allFiles:files,currentIndex:0,totalFiles:files.length};state.plateInput="";state.plateErr="";render();};reader.readAsDataURL(files[0]);event.target.value="";}
+function confirmPlate(){if(!state.plateModal)return;const inp=document.getElementById('plate-inp');const plate=(inp?inp.value:state.plateInput).trim().toUpperCase();if(!plate){state.plateErr="Digite a placa!";render();return;}const dup=getAllPlates().find(p=>p.plate===plate);if(dup){state.plateErr=`Já cadastrada: ${dup.teamName}`;render();return;}const{teamId,src,week,allFiles,currentIndex,totalFiles}=state.plateModal;state.teams[teamId].photos.push({src,week,plate});state.teams[teamId].plates.push({plate,week});showToast(`✓ ${plate} registrada!`);nextPhoto(teamId,week,allFiles,currentIndex,totalFiles);}
+function skipPlate(){if(!state.plateModal)return;const{teamId,src,week,allFiles,currentIndex,totalFiles}=state.plateModal;state.teams[teamId].photos.push({src,week,plate:""});nextPhoto(teamId,week,allFiles,currentIndex,totalFiles);}
+function nextPhoto(teamId,week,allFiles,currentIndex,totalFiles){scheduleSave();const nextIndex=currentIndex+1;if(nextIndex<totalFiles){const reader=new FileReader();reader.onload=ev=>{state.plateModal={teamId,src:ev.target.result,week,allFiles,currentIndex:nextIndex,totalFiles};state.plateInput="";state.plateErr="";render();};reader.readAsDataURL(allFiles[nextIndex]);}else{state.plateModal=null;render();}}
+function deletePhoto(teamId,idx){const photo=state.teams[teamId].photos[idx];state.teams[teamId].photos.splice(idx,1);if(photo?.plate){state.teams[teamId].plates=state.teams[teamId].plates.filter(p=>p.plate!==photo.plate);}scheduleSave();render();}
+render();
 </script>
 </body>
 </html>
+
