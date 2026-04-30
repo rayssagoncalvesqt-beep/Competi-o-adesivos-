@@ -10,7 +10,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#070c14;color:#e8eaf0;font-family:'Barlow',sans-serif;min-height:100vh}
-:root{--bg:#070c14;--surface:#0d1520;--card:#111c2e;--border:#1a2d45;--accent:#3b9eff;--accent2:#1a5fb4;--muted:#7a8099;--text:#e8eaf0;--gold:#60b4ff;--silver:#90caf9;--bronze:#4a90d9}
+:root{--bg:#070c14;--surface:#0d1520;--card:#111c2e;--border:#1a2d45;--accent:#3b9eff;--accent2:#1a5fb4;--muted:#7a8099;--text:#e8eaf0;--gold:#FFD700;--silver:#C0C0C0;--bronze:#CD7F32}
 .wrap{max-width:1380px;margin:0 auto}
 .hdr{background:linear-gradient(135deg,#070c14,#0a1628 50%,#070c14);border-bottom:2px solid var(--accent);padding:20px 24px 14px;position:relative;overflow:hidden}
 .hdr-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -19,7 +19,7 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;color:v
 h1 span{display:block;font-size:.75rem;font-family:'Barlow Condensed',sans-serif;font-weight:600;color:var(--muted);letter-spacing:5px;text-transform:uppercase;margin-top:3px}
 .mbadge{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:3px 11px;border-radius:20px}
 .mbadge.ed{background:rgba(59,158,255,.15);border:1px solid var(--accent);color:var(--accent)}
-.mbadge.vw{background:rgba(96,180,255,.1);border:1px solid var(--gold);color:var(--gold)}
+.mbadge.vw{background:rgba(96,180,255,.1);border:1px solid #60b4ff;color:#60b4ff}
 .hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .badges{display:flex;gap:8px;flex-wrap:wrap}
 .badge{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:7px 14px;text-align:center}
@@ -69,17 +69,17 @@ h1 span{display:block;font-size:.75rem;font-family:'Barlow Condensed',sans-serif
 .upzone{border:2px dashed var(--border);border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:var(--card);margin-top:8px}
 .upzone .ui{font-size:1.6rem;margin-bottom:4px}
 .upzone p{font-family:'Barlow Condensed',sans-serif;font-size:.76rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.rtoggle{display:flex;gap:7px;margin-bottom:14px}
+.rtoggle{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
 .rtbtn{background:var(--card);border:1.5px solid var(--border);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;padding:6px 15px;border-radius:7px;cursor:pointer}
 .rtbtn.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.date-range{background:var(--card);border:1.5px solid var(--border);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:.85rem;padding:6px 12px;border-radius:7px;outline:none;width:160px}
 .rbox{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
-.rbhdr{background:linear-gradient(90deg,rgba(59,158,255,.12),rgba(26,95,180,.08));padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.rbhdr{background:linear-gradient(90deg,rgba(59,158,255,.12),rgba(26,95,180,.08));padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .rbhdr h2{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:3px;color:var(--accent)}
 .wkbadge{background:var(--accent);color:var(--bg);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:2px;padding:3px 10px;border-radius:20px}
 .rrow{display:flex;align-items:center;gap:11px;padding:10px 18px;border-bottom:1px solid var(--border);cursor:pointer}
 .rrow:last-child{border-bottom:none}
-.rpos{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;width:30px;text-align:center;flex-shrink:0}
-.rpos.p1{color:var(--gold)}.rpos.p2{color:var(--silver)}.rpos.p3{color:var(--bronze)}.rpos.po{color:var(--muted)}
+.rpos{font-size:1.8rem;width:36px;text-align:center;flex-shrink:0}
 .rname{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.92rem;flex:1}
 .rbarw{flex:2;display:flex;align-items:center;gap:6px}
 .rbar{flex:1;height:6px;background:var(--surface);border-radius:100px;overflow:hidden}
@@ -125,15 +125,16 @@ firebase.initializeApp(FB);
 var db=firebase.database();
 var TEAMS=[{id:0,name:"Alberto e Gilson"},{id:1,name:"Gemildo"},{id:2,name:"Jesion"},{id:3,name:"Nogueira e Feitosa"},{id:4,name:"Miranda"},{id:5,name:"Wberthyer"},{id:6,name:"Paulo"},{id:7,name:"Ze Roberto"},{id:8,name:"Henrique"}];
 var META=70,META_TOTAL=630,SENHA="roriz2025";
-var S={mode:"select",tab:"ranking",rv:"total",sem:"",teams:{},pwErr:false,lb:null,tShow:false,tMsg:"",tType:"ok",wi:{},loaded:false};
+var MEDALS=["&#127945;","&#129352;","&#129353;","4","5","6","7","8","9"];
+var S={mode:"select",tab:"ranking",rv:"total",sem:"",periodo:"",teams:{},pwErr:false,lb:null,tShow:false,tMsg:"",tType:"ok",wi:{},loaded:false};
 TEAMS.forEach(function(t){S.teams[t.id]={weeks:[],photos:[]};S.wi[t.id]={name:"",cars:""};});
 
-function dataHoje(){var d=new Date();var dia=String(d.getDate()).padStart(2,"0");var mes=String(d.getMonth()+1).padStart(2,"0");var ano=d.getFullYear();var h=String(d.getHours()).padStart(2,"0");var m=String(d.getMinutes()).padStart(2,"0");return dia+"/"+mes+"/"+ano+" "+h+":"+m;}
+function dataHoje(){var d=new Date();return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear()+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
 
 var st=null;
-function salvar(){clearTimeout(st);st=setTimeout(function(){var d={sem:S.sem,teams:{}};TEAMS.forEach(function(t){d.teams[t.id]={weeks:S.teams[t.id].weeks||[],photos:(S.teams[t.id].photos||[]).map(function(p){return{src:p.src||"",week:p.week||"",data:p.data||""};})};});db.ref("comp3").set(d).then(function(){toast("Salvo!","ok");}).catch(function(){toast("Erro","err");});},800);}
+function salvar(){clearTimeout(st);st=setTimeout(function(){var d={sem:S.sem,periodo:S.periodo,teams:{}};TEAMS.forEach(function(t){d.teams[t.id]={weeks:S.teams[t.id].weeks||[],photos:(S.teams[t.id].photos||[]).map(function(p){return{src:p.src||"",week:p.week||"",data:p.data||""};})};});db.ref("comp4").set(d).then(function(){toast("Salvo!","ok");}).catch(function(){toast("Erro","err");});},800);}
 
-function carregar(){db.ref("comp3").once("value").then(function(snap){var d=snap.val();if(d){S.sem=d.sem||"";TEAMS.forEach(function(t){if(d.teams&&d.teams[t.id]){var td=d.teams[t.id];S.teams[t.id]={weeks:td.weeks||[],photos:td.photos||[]};}});}S.loaded=true;render();}).catch(function(){S.loaded=true;render();});}
+function carregar(){db.ref("comp4").once("value").then(function(snap){var d=snap.val();if(d){S.sem=d.sem||"";S.periodo=d.periodo||"";TEAMS.forEach(function(t){if(d.teams&&d.teams[t.id]){var td=d.teams[t.id];S.teams[t.id]={weeks:td.weeks||[],photos:td.photos||[]};}});}S.loaded=true;render();}).catch(function(){S.loaded=true;render();});}
 
 function soma(t){return(t&&t.weeks?t.weeks:[]).reduce(function(s,w){return s+(w.cars||0);},0);}
 function total(){return TEAMS.reduce(function(s,t){return s+soma(S.teams[t.id]);},0);}
@@ -146,7 +147,7 @@ function render(){var a=document.getElementById("app");if(a)a.innerHTML=tela();}
 
 function tela(){if(S.mode==="select")return selTela();if(S.mode==="login")return loginTela();if(!S.loaded)return'<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;font-size:2rem;color:#3b9eff">Carregando...</div>';return mainTela();}
 
-function selTela(){return'<div class="sel-screen"><div style="font-size:3rem">&#127942;</div><div style="font-family:Bebas Neue,sans-serif;font-size:2rem;letter-spacing:3px;color:#3b9eff;text-align:center">Competicao de Adesivagem<div style="font-size:.75rem;color:#7a8099;letter-spacing:5px;margin-top:6px">JOAQUIM RORIZ NETO</div></div><div class="sel-btns"><button class="sel-btn vw" onclick="irV()">&#128065; Visualizar Resultados</button><button class="sel-btn ed" onclick="irL()">&#9997; Editar Admin</button></div></div>';}
+function selTela(){return'<div class="sel-screen"><div style="font-size:3.5rem">&#127942;</div><div style="font-family:Bebas Neue,sans-serif;font-size:2.2rem;letter-spacing:3px;color:#3b9eff;text-align:center">Competicao de Adesivagem<div style="font-size:.8rem;color:#7a8099;letter-spacing:5px;margin-top:8px">JOAQUIM RORIZ NETO</div></div><div class="sel-btns"><button class="sel-btn vw" onclick="irV()">&#128065; Visualizar Resultados</button><button class="sel-btn ed" onclick="irL()">&#9997; Editar Admin</button></div></div>';}
 
 function loginTela(){return'<div style="min-height:100vh;background:#070c14"><div class="pwscreen"><div class="pwbox"><div style="font-size:2rem;margin-bottom:10px">&#128274;</div><h2>Acesso Editor</h2><p>Digite a senha</p><input class="pwinp" type="password" id="pw" placeholder="senha" onkeydown="if(event.key===\'Enter\')login()">'+(S.pwErr?'<div class="pwerr">Senha incorreta</div>':'')+'<button class="pwbtn" onclick="login()">Entrar</button><div style="margin-top:14px"><button class="back-btn" onclick="irS()">Voltar</button></div></div></div></div>';}
 
@@ -163,8 +164,15 @@ return'<div style="min-height:100vh;background:#070c14"><header class="hdr"><div
 
 function rankPainel(gt,pct){
 var s=rank(S.rv);var max=s.length>0?s[0].total:1;var linhas="";
-for(var i=0;i<s.length;i++){var t=s[i];var pos=i+1;var cl=pos===1?"p1":pos===2?"p2":pos===3?"p3":"po";var bw=max>0?Math.round(t.total/max*100):0;linhas+='<div class="rrow" onclick="setTab('+t.id+')"><div class="rpos '+cl+'">'+pos+'</div><div class="rname">'+t.name+'</div><div class="rbarw"><div class="rbar"><div class="rbarf" style="width:'+bw+'%"></div></div></div><div class="rcars">'+t.total+'</div><div class="rpct">'+(S.rv==="week"?t.total+" c":Math.round(t.total/META*100)+"%")+'</div></div>';}
-return'<div><div class="ph"><div class="pname">&#127942; Ranking Geral</div><div class="sbtns"><button class="sbtn s1" onclick="copiar(\'week\')">&#128203; Copiar Semana</button><button class="sbtn s2" onclick="copiar(\'total\')">&#127942; Copiar Total</button></div></div><div class="rtoggle"><button class="rtbtn '+(S.rv==="total"?"active":"")+'" onclick="S.rv=\'total\';render()">&#128202; Total</button><button class="rtbtn '+(S.rv==="week"?"active":"")+'" onclick="S.rv=\'week\';render()">&#128197; Semana</button></div><div class="rbox"><div class="rbhdr"><h2>'+(S.rv==="week"?"Ranking Semana":"Classificacao Total")+'</h2><span class="wkbadge">'+(S.sem||"---")+'</span></div>'+linhas+'</div><div class="prog-card"><div class="prg-lbl"><span>Progresso Geral</span><span>'+pct+'%</span></div><div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div><div class="note">META: 70 POR EQUIPE - 630 NO TOTAL</div></div></div>';}
+for(var i=0;i<s.length;i++){
+var t=s[i];var pos=i+1;
+var medal=pos<=3?MEDALS[i]:pos+"o";
+var bw=max>0?Math.round(t.total/max*100):0;
+var pctT=Math.round(t.total/META*100);
+linhas+='<div class="rrow" onclick="setTab('+t.id+')"><div class="rpos">'+medal+'</div><div class="rname">'+t.name+'</div><div class="rbarw"><div class="rbar"><div class="rbarf" style="width:'+bw+'%"></div></div></div><div class="rcars">'+t.total+'</div><div class="rpct">'+(S.rv==="week"?t.total+" c":pctT+"%")+'</div></div>';}
+var periodoInput=S.mode==="editor"?'<input class="date-range" id="periodo" value="'+S.periodo+'" placeholder="Ex: 27/04 a 02/05" oninput="S.periodo=this.value;salvar()">':'';
+var periodoLabel=S.periodo?'<span class="wkbadge" style="background:#1a5fb4">'+S.periodo+'</span>':'';
+return'<div><div class="ph"><div class="pname">&#127942; Ranking Geral</div><div class="sbtns"><button class="sbtn s1" onclick="copiar(\'week\')">&#128203; Copiar Semana</button><button class="sbtn s2" onclick="copiar(\'total\')">&#127942; Copiar Total</button></div></div><div class="rtoggle"><button class="rtbtn '+(S.rv==="total"?"active":"")+'" onclick="S.rv=\'total\';render()">&#128202; Total</button><button class="rtbtn '+(S.rv==="week"?"active":"")+'" onclick="S.rv=\'week\';render()">&#128197; Semana</button>'+periodoInput+'</div><div class="rbox"><div class="rbhdr"><h2>'+(S.rv==="week"?"Ranking da Semana":"Classificacao Total")+'</h2><div style="display:flex;gap:6px;align-items:center"><span class="wkbadge">'+(S.sem||"---")+'</span>'+periodoLabel+'</div></div>'+linhas+'</div><div class="prog-card"><div class="prg-lbl"><span>Progresso Geral</span><span>'+pct+'%</span></div><div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div><div class="note">META: 70 POR EQUIPE - 630 NO TOTAL</div></div></div>';}
 
 function edPainel(t){
 var d=S.teams[t.id];var tot=soma(d);var pct=Math.min(100,Math.round(tot/META*100));var wi=S.wi[t.id];
@@ -172,7 +180,7 @@ var sems=d.weeks.length===0?'<span class="empty">Sem registros</span>':"";
 for(var i=0;i<d.weeks.length;i++){var w=d.weeks[i];sems+='<div class="wkcard"><div><div class="wl">'+w.name+'</div><div class="wc">'+w.cars+' carros</div></div><button class="wk-del" onclick="delSem('+t.id+','+i+')">X</button></div>';}
 var fotos="";
 for(var j=0;j<d.photos.length;j++){var p=d.photos[j];fotos+='<div class="pitem" onclick="abrirFoto('+t.id+','+j+')"><img src="'+p.src+'" alt=""><button class="pdel" onclick="event.stopPropagation();delFoto('+t.id+','+j+')">X</button>'+(p.data?'<div class="ptag">'+p.data+'</div>':'')+'</div>';}
-return'<div><div class="ph"><div class="pname"><span>'+t.name+'</span></div><div class="stats"><div class="stat p"><div class="v">'+tot+'</div><div class="l">Adesivados</div></div><div class="stat s"><div class="v">'+Math.max(0,META-tot)+'</div><div class="l">Faltam</div></div><div class="stat s"><div class="v">'+d.photos.length+'</div><div class="l">&#128247; Fotos</div></div></div></div><div class="prg"><div class="prg-lbl"><span>Progresso</span><span>'+pct+'% da meta</span></div><div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div></div><div class="addwk"><span class="lbl">+ Registrar</span><input class="wni" id="wn'+t.id+'" value="'+wi.name+'" placeholder="Semana 1" onkeydown="if(event.key===\'Enter\')addSem('+t.id+')"><input class="cni" id="wc'+t.id+'" type="number" value="'+wi.cars+'" placeholder="00" min="0" max="70" onkeydown="if(event.key===\'Enter\')addSem('+t.id+')"><button class="btn-add" onclick="addSem('+t.id+')">Adicionar</button></div><div class="sec-title">&#128197; Historico por Semana</div><div class="wkgrid">'+sems+'</div><div class="sec-title" style="margin-bottom:12px">&#128247; Fotos ('+d.photos.length+')</div><div class="pgrid">'+fotos+'</div><div class="upzone" onclick="document.getElementById(\'up'+t.id+'\').click()"><div class="ui">&#128247;</div><p>Clique para adicionar fotos</p><input id="up'+t.id+'" type="file" accept="image/*" multiple style="display:none" onchange="upload(event,'+t.id+')"></div></div>';}
+return'<div><div class="ph"><div class="pname"><span>'+t.name+'</span></div><div class="stats"><div class="stat p"><div class="v">'+tot+'</div><div class="l">Adesivados</div></div><div class="stat s"><div class="v">'+Math.max(0,META-tot)+'</div><div class="l">Faltam</div></div><div class="stat s"><div class="v">'+d.photos.length+'</div><div class="l">&#128247; Fotos</div></div></div></div><div class="prg"><div class="prg-lbl"><span>Progresso</span><span>'+pct+'% da meta</span></div><div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div></div><div class="addwk"><span class="lbl">+ Registrar</span><input class="wni" id="wn'+t.id+'" value="'+wi.name+'" placeholder="Semana 1" onkeydown="if(event.key===\'Enter\')addSem('+t.id+')"><input class="cni" id="wc'+t.id+'" type="number" value="'+wi.cars+'" placeholder="00" min="0" max="70" onkeydown="if(event.key===\'Enter\')addSem('+t.id+')"><button class="btn-add" onclick="addSem('+t.id+')">Adicionar</button></div><div class="sec-title">&#128197; Historico</div><div class="wkgrid">'+sems+'</div><div class="sec-title" style="margin-bottom:12px">&#128247; Fotos ('+d.photos.length+')</div><div class="pgrid">'+fotos+'</div><div class="upzone" onclick="document.getElementById(\'up'+t.id+'\').click()"><div class="ui">&#128247;</div><p>Clique para adicionar fotos</p><input id="up'+t.id+'" type="file" accept="image/*" multiple style="display:none" onchange="upload(event,'+t.id+')"></div></div>';}
 
 function vwPainel(t){
 var d=S.teams[t.id];var tot=soma(d);var pct=Math.min(100,Math.round(tot/META*100));
@@ -208,8 +216,7 @@ var week=S.sem||"";var done=0;
 files.forEach(function(file){
 var reader=new FileReader();
 reader.onload=function(e){
-var dataEnvio=dataHoje();
-S.teams[tid].photos.push({src:e.target.result,week:week,data:dataEnvio});
+S.teams[tid].photos.push({src:e.target.result,week:week,data:dataHoje()});
 done++;
 if(done===files.length){salvar();render();toast(done+" foto(s) adicionada(s)","ok");}
 };
@@ -221,10 +228,16 @@ function delFoto(tid,idx){S.teams[tid].photos.splice(idx,1);salvar();render();}
 function abrirFoto(tid,idx){var p=S.teams[tid].photos[idx];if(p){S.lb=p.src;render();}}
 
 function copiar(tipo){
-var s=rank(tipo);var txt=tipo==="week"?"RANKING DA SEMANA - "+(S.sem||"---")+"\n":"RANKING TOTAL - "+(S.sem||"---")+"\n";
-txt+="================\n";
-for(var i=0;i<s.length;i++){txt+=(i+1)+"o "+s[i].name+"\n   "+s[i].total+" carros adesivados\n";}
-txt+="================\n";
+var s=rank(tipo);
+var cabecalho=tipo==="week"?"RANKING DA SEMANA":"RANKING TOTAL";
+var periodo=S.periodo?" ("+S.periodo+")":"";
+var txt=cabecalho+" - "+(S.sem||"---")+periodo+"\n";
+txt+="================================\n";
+for(var i=0;i<s.length;i++){
+var pos=i+1;
+var emoji=pos===1?"1o":pos===2?"2o":pos===3?"3o":pos+"o";
+txt+=emoji+" "+s[i].name+"\n   "+s[i].total+" carros adesivados\n";}
+txt+="================================\n";
 txt+=tipo==="week"?"Total na semana: "+s.reduce(function(a,t){return a+t.total;},0)+"\n":"Meta: 70/equipe | Total geral: "+total()+"\n";
 navigator.clipboard.writeText(txt).then(function(){alert("Copiado! Cole no WhatsApp.");}).catch(function(){prompt("Copie:",txt);});}
 
