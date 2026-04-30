@@ -124,41 +124,35 @@ h1 span{display:block;font-size:.75rem;font-family:'Barlow Condensed',sans-serif
 var FB={apiKey:"AIzaSyBuZst0oOe6O0nHbMpqoi3jHn2g30TwkOk",authDomain:"competicao-roriz.firebaseapp.com",databaseURL:"https://competicao-roriz-default-rtdb.firebaseio.com",projectId:"competicao-roriz",storageBucket:"competicao-roriz.firebasestorage.app",messagingSenderId:"54357624066",appId:"1:54357624066:web:66a8b5fa08b8505abaae1b"};
 firebase.initializeApp(FB);
 var db=firebase.database();
-
 var CLOUD_NAME="dtcutnwvc";
 var UPLOAD_PRESET="competicao_roriz";
-
 var TEAMS=[{id:0,name:"Alberto e Gilson"},{id:1,name:"Gemildo"},{id:2,name:"Jesion"},{id:3,name:"Nogueira e Feitosa"},{id:4,name:"Miranda"},{id:5,name:"Wberthyer"},{id:6,name:"Paulo"},{id:7,name:"Ze Roberto"},{id:8,name:"Henrique"}];
-var META=70,META_TOTAL=630,SENHA="roriz2025";
+var SENHA="roriz2025";
 var MEDALS=["&#127945;","&#129352;","&#129353;"];
-var S={mode:"select",tab:"ranking",rv:"total",sem:"",periodo:"",teams:{},pwErr:false,lb:null,tShow:false,tMsg:"",tType:"ok",wi:{},loaded:false,uploading:false};
+var S={mode:"select",tab:"ranking",rv:"total",sem:"",periodo:"",teams:{},pwErr:false,lb:null,tShow:false,tMsg:"",tType:"ok",wi:{},loaded:false,uploading:false,uploadingTeam:-1};
 TEAMS.forEach(function(t){S.teams[t.id]={weeks:[],photos:[]};S.wi[t.id]={name:"",cars:""};});
 
 function dataHoje(){var d=new Date();return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear()+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
 
 function uploadToCloudinary(file,callback){
-var formData=new FormData();
-formData.append("file",file);
-formData.append("upload_preset",UPLOAD_PRESET);
-formData.append("folder","competicao_roriz");
+var fd=new FormData();
+fd.append("file",file);
+fd.append("upload_preset",UPLOAD_PRESET);
+fd.append("folder","competicao_roriz");
 var xhr=new XMLHttpRequest();
 xhr.open("POST","https://api.cloudinary.com/v1_1/"+CLOUD_NAME+"/image/upload");
-xhr.onload=function(){
-var res=JSON.parse(xhr.responseText);
-if(res.secure_url){callback(null,res.secure_url);}
-else{callback("Erro upload");}
-};
-xhr.onerror=function(){callback("Erro de rede");};
-xhr.send(formData);
-}
+xhr.onload=function(){try{var r=JSON.parse(xhr.responseText);if(r.secure_url)callback(null,r.secure_url);else callback("erro");}catch(e){callback("erro");}};
+xhr.onerror=function(){callback("erro rede");};
+xhr.send(fd);}
 
 var st=null;
-function salvar(){clearTimeout(st);st=setTimeout(function(){var d={sem:S.sem,periodo:S.periodo,teams:{}};TEAMS.forEach(function(t){d.teams[t.id]={weeks:S.teams[t.id].weeks||[],photos:S.teams[t.id].photos||[]};});db.ref("comp5").set(d).then(function(){toast("Salvo!","ok");}).catch(function(){toast("Erro","err");});},800);}
+function salvar(){clearTimeout(st);st=setTimeout(function(){var d={sem:S.sem,periodo:S.periodo,teams:{}};TEAMS.forEach(function(t){d.teams[t.id]={weeks:S.teams[t.id].weeks||[],photos:S.teams[t.id].photos||[]};});db.ref("comp6").set(d).then(function(){toast("Salvo!","ok");}).catch(function(){toast("Erro ao salvar","err");});},800);}
 
-function carregar(){db.ref("comp5").once("value").then(function(snap){var d=snap.val();if(d){S.sem=d.sem||"";S.periodo=d.periodo||"";TEAMS.forEach(function(t){if(d.teams&&d.teams[t.id]){S.teams[t.id]={weeks:d.teams[t.id].weeks||[],photos:d.teams[t.id].photos||[]};}});}S.loaded=true;render();}).catch(function(){S.loaded=true;render();});}
+function carregar(){db.ref("comp6").once("value").then(function(snap){var d=snap.val();if(d){S.sem=d.sem||"";S.periodo=d.periodo||"";TEAMS.forEach(function(t){if(d.teams&&d.teams[t.id]){S.teams[t.id]={weeks:d.teams[t.id].weeks||[],photos:d.teams[t.id].photos||[]};}});}S.loaded=true;render();}).catch(function(){S.loaded=true;render();});}
 
 function soma(t){return(t&&t.weeks?t.weeks:[]).reduce(function(s,w){return s+(w.cars||0);},0);}
-function total(){return TEAMS.reduce(function(s,t){return s+soma(S.teams[t.id]);},0);}
+function totalGeral(){return TEAMS.reduce(function(s,t){return s+soma(S.teams[t.id]);},0);}
+function maxTotal(){var m=0;TEAMS.forEach(function(t){var v=soma(S.teams[t.id]);if(v>m)m=v;});return m||100;}
 function semCars(tid){var wks=S.teams[tid].weeks||[];var m=wks.filter(function(w){return w.name.trim()===S.sem.trim();});if(m.length)return m.reduce(function(s,w){return s+w.cars;},0);if(wks.length)return wks[wks.length-1].cars;return 0;}
 function rank(modo){return TEAMS.map(function(t){return{id:t.id,name:t.name,total:modo==="week"?semCars(t.id):soma(S.teams[t.id])};}).sort(function(a,b){return b.total-a.total;});}
 
@@ -173,44 +167,52 @@ function selTela(){return'<div class="sel-screen"><div style="font-size:3.5rem">
 function loginTela(){return'<div style="min-height:100vh;background:#070c14"><div class="pwscreen"><div class="pwbox"><div style="font-size:2rem;margin-bottom:10px">&#128274;</div><h2>Acesso Editor</h2><p>Digite a senha</p><input class="pwinp" type="password" id="pw" placeholder="senha" onkeydown="if(event.key===\'Enter\')login()">'+(S.pwErr?'<div class="pwerr">Senha incorreta</div>':'')+'<button class="pwbtn" onclick="login()">Entrar</button><div style="margin-top:14px"><button class="back-btn" onclick="irS()">Voltar</button></div></div></div></div>';}
 
 function mainTela(){
-var isEd=S.mode==="editor";var gt=total();var pct=Math.min(100,Math.round(gt/META_TOTAL*100));
+var isEd=S.mode==="editor";
+var gt=totalGeral();
+var mx=maxTotal();
+var pct=Math.min(100,Math.round(gt/(mx*TEAMS.length)*100));
 var painel="";
-if(S.tab==="ranking"){painel=rankPainel(gt,pct);}
+if(S.tab==="ranking"){painel=rankPainel(gt,pct,mx);}
 else{for(var i=0;i<TEAMS.length;i++){if(TEAMS[i].id===S.tab){painel=isEd?edPainel(TEAMS[i]):vwPainel(TEAMS[i]);break;}}}
 var tabs='<button class="tab '+(S.tab==="ranking"?"active":"")+'" onclick="setTab(\'ranking\')">&#127942; Ranking</button>';
 for(var j=0;j<TEAMS.length;j++){var t=TEAMS[j];tabs+='<button class="tab '+(S.tab===t.id?"active":"")+'" onclick="setTab('+t.id+')">'+t.name+'<span class="tbadge">'+soma(S.teams[t.id])+'</span></button>';}
-var dr=(isEd?'':'<button class="refbtn" onclick="carregar()">&#8635; Atualizar</button>')+'<div class="badges"><div class="badge"><div class="n">'+gt+'</div><div class="l">Adesivados</div></div><div class="badge"><div class="n">70</div><div class="l">Meta/Equipe</div></div><div class="badge"><div class="n">'+Math.max(0,META_TOTAL-gt)+'</div><div class="l">Restantes</div></div></div><button class="back-btn" onclick="irS()">Sair</button>';
+var dr=(isEd?'':'<button class="refbtn" onclick="carregar()">&#8635; Atualizar</button>')+'<div class="badges"><div class="badge"><div class="n">'+gt+'</div><div class="l">Total Adesivados</div></div><div class="badge"><div class="n">'+TEAMS.length+'</div><div class="l">Equipes</div></div></div><button class="back-btn" onclick="irS()">Sair</button>';
 var semH=isEd?'<input class="wkinput" id="sem" value="'+S.sem+'" placeholder="Ex: Semana 1" oninput="S.sem=this.value;salvar()">':'<span class="wkval">'+(S.sem||"---")+'</span>';
 return'<div style="min-height:100vh;background:#070c14"><header class="hdr"><div class="wrap hdr-inner"><div class="hdr-left"><div style="font-size:2.4rem">&#127942;</div><div><h1>Competicao<span>Adesivagem de Carros</span></h1></div><span class="mbadge '+(isEd?"ed":"vw")+'">'+(isEd?"&#9997; Editor":"&#128065; Visualizacao")+'</span></div><div class="hdr-right">'+dr+'</div></div></header><div class="wrap wkbar"><span class="wklbl">&#128197; Semana:</span>'+semH+'</div><div class="wrap tabs-wrap"><div class="tabs">'+tabs+'</div></div><div class="wrap panels">'+painel+'</div>'+lbHTML()+'<div class="toast '+S.tType+(S.tShow?" show":"")+'">'+S.tMsg+'</div></div>';}
 
-function rankPainel(gt,pct){
+function rankPainel(gt,pct,mx){
 var s=rank(S.rv);var max=s.length>0?s[0].total:1;var linhas="";
 for(var i=0;i<s.length;i++){
 var t=s[i];var pos=i+1;
 var medal=pos<=3?MEDALS[i]:pos+"o";
 var bw=max>0?Math.round(t.total/max*100):0;
-linhas+='<div class="rrow" onclick="setTab('+t.id+')"><div class="rpos">'+medal+'</div><div class="rname">'+t.name+'</div><div class="rbarw"><div class="rbar"><div class="rbarf" style="width:'+bw+'%"></div></div></div><div class="rcars">'+t.total+'</div><div class="rpct">'+(S.rv==="week"?t.total+" c":Math.round(t.total/META*100)+"%")+'</div></div>';}
+linhas+='<div class="rrow" onclick="setTab('+t.id+')"><div class="rpos">'+medal+'</div><div class="rname">'+t.name+'</div><div class="rbarw"><div class="rbar"><div class="rbarf" style="width:'+bw+'%"></div></div></div><div class="rcars">'+t.total+'</div><div class="rpct">'+t.total+' carros</div></div>';}
 var periodoInput=S.mode==="editor"?'<input class="date-range" id="periodo" value="'+S.periodo+'" placeholder="Ex: 27/04 a 02/05" oninput="S.periodo=this.value;salvar()">':'';
 var periodoLabel=S.periodo?'<span class="wkbadge" style="background:#1a5fb4">'+S.periodo+'</span>':'';
-return'<div><div class="ph"><div class="pname">&#127942; Ranking Geral</div><div class="sbtns"><button class="sbtn s1" onclick="copiar(\'week\')">&#128203; Copiar Semana</button><button class="sbtn s2" onclick="copiar(\'total\')">&#127942; Copiar Total</button></div></div><div class="rtoggle"><button class="rtbtn '+(S.rv==="total"?"active":"")+'" onclick="S.rv=\'total\';render()">&#128202; Total</button><button class="rtbtn '+(S.rv==="week"?"active":"")+'" onclick="S.rv=\'week\';render()">&#128197; Semana</button>'+periodoInput+'</div><div class="rbox"><div class="rbhdr"><h2>'+(S.rv==="week"?"Ranking da Semana":"Classificacao Total")+'</h2><div style="display:flex;gap:6px;align-items:center"><span class="wkbadge">'+(S.sem||"---")+'</span>'+periodoLabel+'</div></div>'+linhas+'</div><div class="prog-card"><div class="prg-lbl"><span>Progresso Geral</span><span>'+pct+'%</span></div><div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div><div class="note">META: 70 POR EQUIPE - 630 NO TOTAL</div></div></div>';}
+var lider=s.length>0?s[0]:null;
+var liderHTML=lider&&lider.total>0?'<div style="font-family:Barlow Condensed,sans-serif;font-size:.8rem;color:var(--muted);margin-top:8px">Lider: <span style="color:var(--gold)">'+lider.name+'</span> com <span style="color:var(--accent)">'+lider.total+' carros</span></div>':'';
+return'<div><div class="ph"><div class="pname">&#127942; Ranking Geral</div><div class="sbtns"><button class="sbtn s1" onclick="copiar(\'week\')">&#128203; Copiar Semana</button><button class="sbtn s2" onclick="copiar(\'total\')">&#127942; Copiar Total</button></div></div><div class="rtoggle"><button class="rtbtn '+(S.rv==="total"?"active":"")+'" onclick="S.rv=\'total\';render()">&#128202; Total</button><button class="rtbtn '+(S.rv==="week"?"active":"")+'" onclick="S.rv=\'week\';render()">&#128197; Semana</button>'+periodoInput+'</div><div class="rbox"><div class="rbhdr"><h2>'+(S.rv==="week"?"Ranking da Semana":"Classificacao Total")+'</h2><div style="display:flex;gap:6px;align-items:center"><span class="wkbadge">'+(S.sem||"---")+'</span>'+periodoLabel+'</div></div>'+linhas+'</div><div class="prog-card"><div class="prg-lbl"><span>Total Geral</span><span>'+gt+' carros</span></div><div class="prg-track"><div class="prg-fill" style="width:100%"></div></div>'+liderHTML+'</div></div>';}
 
 function edPainel(t){
-var d=S.teams[t.id];var tot=soma(d);var pct=Math.min(100,Math.round(tot/META*100));var wi=S.wi[t.id];
+var d=S.teams[t.id];var tot=soma(d);
+var mx=maxTotal();var pct=mx>0?Math.min(100,Math.round(tot/mx*100)):0;
+var wi=S.wi[t.id];
 var sems=d.weeks.length===0?'<span class="empty">Sem registros</span>':"";
 for(var i=0;i<d.weeks.length;i++){var w=d.weeks[i];sems+='<div class="wkcard"><div><div class="wl">'+w.name+'</div><div class="wc">'+w.cars+' carros</div></div><button class="wk-del" onclick="delSem('+t.id+','+i+')">X</button></div>';}
 var fotos="";
 for(var j=0;j<d.photos.length;j++){var p=d.photos[j];fotos+='<div class="pitem" onclick="abrirFoto(\''+p.url+'\')"><img src="'+p.url+'" alt="" loading="lazy"><button class="pdel" onclick="event.stopPropagation();delFoto('+t.id+','+j+')">X</button>'+(p.data?'<div class="ptag">'+p.data+'</div>':'')+'</div>';}
 var uploadingHTML=S.uploading&&S.uploadingTeam===t.id?'<div class="uploading">&#128247; Enviando fotos... aguarde</div>':'';
-return'<div><div class="ph"><div class="pname"><span>'+t.name+'</span></div><div class="stats"><div class="stat p"><div class="v">'+tot+'</div><div class="l">Adesivados</div></div><div class="stat s"><div class="v">'+Math.max(0,META-tot)+'</div><div class="l">Faltam</div></div><div class="stat s"><div class="v">'+d.photos.length+'</div><div class="l">&#128247; Fotos</div></div></div></div><div class="prg"><div class="prg-lbl"><span>Progresso</span><span>'+pct+'% da meta</span></div><div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div></div><div class="addwk"><span class="lbl">+ Registrar</span><input class="wni" id="wn'+t.id+'" value="'+wi.name+'" placeholder="Semana 1" onkeydown="if(event.key===\'Enter\')addSem('+t.id+')"><input class="cni" id="wc'+t.id+'" type="number" value="'+wi.cars+'" placeholder="00" min="0" onkeydown="if(event.key===\'Enter\')addSem('+t.id+')"><button class="btn-add" onclick="addSem('+t.id+')">Adicionar</button></div><div class="sec-title">&#128197; Historico</div><div class="wkgrid">'+sems+'</div><div class="sec-title" style="margin-bottom:12px">&#128247; Fotos ('+d.photos.length+')</div><div class="pgrid">'+fotos+'</div><div class="upzone" onclick="document.getElementById(\'up'+t.id+'\').click()"><div class="ui">&#128247;</div><p>Clique para adicionar fotos</p><input id="up'+t.id+'" type="file" accept="image/*" multiple style="display:none" onchange="upload(event,'+t.id+')"></div>'+uploadingHTML+'</div>';}
+return'<div><div class="ph"><div class="pname"><span>'+t.name+'</span></div><div class="stats"><div class="stat p"><div class="v">'+tot+'</div><div class="l">Adesivados</div></div><div class="stat s"><div class="v">'+d.photos.length+'</div><div class="l">&#128247; Fotos</div></div></div></div><div class="prg"><div class="prg-lbl"><span>Progresso</span><span>'+tot+' carros</span></div><div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div></div><div class="addwk"><span class="lbl">+ Registrar</span><input class="wni" id="wn'+t.id+'" value="'+wi.name+'" placeholder="Semana 1" onkeydown="if(event.key===\'Enter\')addSem('+t.id+')"><input class="cni" id="wc'+t.id+'" type="number" value="'+wi.cars+'" placeholder="00" min="0" onkeydown="if(event.key===\'Enter\')addSem('+t.id+')"><button class="btn-add" onclick="addSem('+t.id+')">Adicionar</button></div><div class="sec-title">&#128197; Historico</div><div class="wkgrid">'+sems+'</div><div class="sec-title" style="margin-bottom:12px">&#128247; Fotos ('+d.photos.length+')</div><div class="pgrid">'+fotos+'</div><div class="upzone" onclick="document.getElementById(\'up'+t.id+'\').click()"><div class="ui">&#128247;</div><p>Clique para adicionar fotos (sem limite)</p><input id="up'+t.id+'" type="file" accept="image/*" multiple style="display:none" onchange="upload(event,'+t.id+')"></div>'+uploadingHTML+'</div>';}
 
 function vwPainel(t){
-var d=S.teams[t.id];var tot=soma(d);var pct=Math.min(100,Math.round(tot/META*100));
+var d=S.teams[t.id];var tot=soma(d);
+var mx=maxTotal();var pct=mx>0?Math.min(100,Math.round(tot/mx*100)):0;
 var sems=d.weeks.length===0?'<span class="empty">Sem registros</span>':"";
 for(var i=0;i<d.weeks.length;i++){sems+='<div class="wkcard"><div class="wl">'+d.weeks[i].name+'</div><div class="wc">'+d.weeks[i].cars+' carros</div></div>';}
 var fotos=d.photos.length===0?'<span class="empty">Sem fotos</span>':'<div class="pgrid">';
 for(var j=0;j<d.photos.length;j++){var p=d.photos[j];fotos+='<div class="pitem" onclick="abrirFoto(\''+p.url+'\')"><img src="'+p.url+'" alt="" loading="lazy">'+(p.data?'<div class="ptag">'+p.data+'</div>':'')+'</div>';}
 if(d.photos.length>0)fotos+='</div>';
-return'<div><div class="ph"><div class="pname"><span>'+t.name+'</span></div><div class="stats"><div class="stat p"><div class="v">'+tot+'</div><div class="l">Adesivados</div></div><div class="stat s"><div class="v">'+Math.max(0,META-tot)+'</div><div class="l">Faltam</div></div><div class="stat s"><div class="v">'+d.photos.length+'</div><div class="l">&#128247; Fotos</div></div></div></div><div class="prg"><div class="prg-lbl"><span>Progresso</span><span>'+pct+'%</span></div><div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div></div><div class="sec-title">&#128197; Historico</div><div class="wkgrid" style="margin-bottom:22px">'+sems+'</div><div class="sec-title" style="margin-bottom:12px">&#128247; Fotos ('+d.photos.length+')</div>'+fotos+'</div>';}
+return'<div><div class="ph"><div class="pname"><span>'+t.name+'</span></div><div class="stats"><div class="stat p"><div class="v">'+tot+'</div><div class="l">Adesivados</div></div><div class="stat s"><div class="v">'+d.photos.length+'</div><div class="l">&#128247; Fotos</div></div></div></div><div class="prg"><div class="prg-lbl"><span>Progresso</span><span>'+tot+' carros</span></div><div class="prg-track"><div class="prg-fill" style="width:'+pct+'%"></div></div></div><div class="sec-title">&#128197; Historico</div><div class="wkgrid" style="margin-bottom:22px">'+sems+'</div><div class="sec-title" style="margin-bottom:12px">&#128247; Fotos ('+d.photos.length+')</div>'+fotos+'</div>';}
 
 function lbHTML(){if(!S.lb)return'';return'<div class="lb open" onclick="S.lb=null;render()"><button class="lbclose" onclick="S.lb=null;render()">X</button><img src="'+S.lb+'" alt="" onclick="event.stopPropagation()"></div>';}
 
@@ -238,19 +240,12 @@ S.uploading=true;S.uploadingTeam=tid;render();
 var done=0;var erros=0;
 files.forEach(function(file){
 uploadToCloudinary(file,function(err,url){
-if(err){erros++;} else{
-var dataEnvio=dataHoje();
-S.teams[tid].photos.push({url:url,week:week,data:dataEnvio});
-}
+if(err){erros++;}else{S.teams[tid].photos.push({url:url,week:week,data:dataHoje()});}
 done++;
-if(done===files.length){
-S.uploading=false;
-salvar();render();
-if(erros>0){toast(erros+" erro(s) no upload","err");}
-else{toast((done-erros)+" foto(s) enviada(s)!","ok");}
-}
-});
-});
+if(done===files.length){S.uploading=false;salvar();render();
+if(erros>0)toast(erros+" erro(s) no upload","err");
+else toast((done-erros)+" foto(s) enviada(s)!","ok");}
+});});
 event.target.value="";}
 
 function delFoto(tid,idx){S.teams[tid].photos.splice(idx,1);salvar();render();}
@@ -263,10 +258,9 @@ var txt=tipo==="week"?"RANKING DA SEMANA - "+(S.sem||"---")+periodo+"\n":"RANKIN
 txt+="================================\n";
 for(var i=0;i<s.length;i++){
 var pos=i+1;
-var emoji=pos===1?"1o &#127945;":pos===2?"2o &#129352;":pos===3?"3o &#129353;":pos+"o";
 txt+=pos+"o "+s[i].name+"\n   "+s[i].total+" carros adesivados\n";}
 txt+="================================\n";
-txt+=tipo==="week"?"Total na semana: "+s.reduce(function(a,t){return a+t.total;},0)+"\n":"Meta: 70/equipe | Total geral: "+total()+"\n";
+txt+=tipo==="week"?"Total na semana: "+s.reduce(function(a,t){return a+t.total;},0)+"\n":"Total geral: "+totalGeral()+" carros\n";
 navigator.clipboard.writeText(txt).then(function(){alert("Copiado! Cole no WhatsApp.");}).catch(function(){prompt("Copie:",txt);});}
 
 render();
